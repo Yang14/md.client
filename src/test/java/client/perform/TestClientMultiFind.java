@@ -18,10 +18,10 @@ public class TestClientMultiFind {
 
     private ClientService clientService = new ClientServiceImpl();
 
-    private int threadCount = 64;
+    private int threadCount = 16;
     private int count = 10000;
-    private CountDownLatch latchCreate = new CountDownLatch(threadCount);
-    private CountDownLatch latchFind = new CountDownLatch(threadCount);
+    private CountDownLatch latchDir = new CountDownLatch(threadCount);
+    private CountDownLatch latchFile = new CountDownLatch(threadCount);
 
     private CountDownLatch latchForOps = new CountDownLatch(1);
 
@@ -45,13 +45,12 @@ public class TestClientMultiFind {
     }
 
     public void testMultiListDir() throws InterruptedException, RemoteException {
-        latchForOps.await();
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
                     listDir("/" + Thread.currentThread().getName());
-                    latchCreate.countDown();
+                    latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -61,7 +60,7 @@ public class TestClientMultiFind {
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
-        latchFind.await();
+        latchDir.await();
         long end = System.currentTimeMillis();
         logger.info(String.format("list dir, thread count is %s time: %s", threadCount, (end - start)));
     }
@@ -72,7 +71,7 @@ public class TestClientMultiFind {
             public void run() {
                 try {
                     findFile("/" + Thread.currentThread().getName() + "-forFile");
-                    latchCreate.countDown();
+                    latchFile.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -82,13 +81,13 @@ public class TestClientMultiFind {
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
-        latchFind.await();
+        latchFile.await();
         long end = System.currentTimeMillis();
         logger.info(String.format("find file, thread count is %s time: %s", threadCount, (end - start)));
     }
     private void listDir(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {
-            clientService.listDir(parentDir+ "/file" + i);
+            clientService.listDir(parentDir+ "/dir" + i);
         }
     }
 

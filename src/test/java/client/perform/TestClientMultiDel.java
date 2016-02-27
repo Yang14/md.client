@@ -19,10 +19,11 @@ public class TestClientMultiDel {
     @Test
     public void testClearMd() throws InterruptedException, RemoteException {
         long start = System.currentTimeMillis();
-        clientService.deleteDir("/");
+        clientService.deleteDir("/","");
         long end = System.currentTimeMillis();
-        logger.info(String.format("delete ok, thread count is %s time: %s",
-                (end - start)));
+        logger.info(String.format("delete ok, thread count is %s time: %s",1,(end - start)));
     }
+
+
 
 }

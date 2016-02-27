@@ -95,8 +95,16 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public boolean deleteDir(String dirPath) throws RemoteException {
-        return indexOps.deleteDir(dirPath);
+    public boolean deleteDir(String parentPath,String dirName) throws RemoteException {
+        List<MdPos> mdPosList = getMdPosListByPath(parentPath);
+        boolean renameResult = false;
+        for (MdPos mdPos : mdPosList) {
+            renameResult = ssdbService.deleteMd(mdPos, dirName);
+            if (renameResult) {
+                break;
+            }
+        }
+        return indexOps.deleteDir(parentPath+dirName);
     }
 
     @Override

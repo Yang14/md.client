@@ -19,10 +19,10 @@ public class TestClientMultiCreate {
 
     private ClientService clientService = new ClientServiceImpl();
 
-    private int threadCount = 64;
+    private int threadCount = 4;
     private int count = 10000;
-    private CountDownLatch latchCreate = new CountDownLatch(threadCount);
-    private CountDownLatch latchFind = new CountDownLatch(threadCount);
+    private CountDownLatch latchDir = new CountDownLatch(threadCount);
+    private CountDownLatch latchFile = new CountDownLatch(threadCount);
 
     private CountDownLatch latchForOps = new CountDownLatch(1);
 
@@ -40,7 +40,7 @@ public class TestClientMultiCreate {
         for (int i = 0; i < threadCount; i++) {
             String threadName = "t" + i;
             clientService.createDirMd("/", threadName, getMdAttr(threadName, 5, true));
-            clientService.createFileMd("/", threadName + "-forFile", getMdAttr(threadName + "-forFile", 99, false));
+            clientService.createDirMd("/", threadName + "-forFile", getMdAttr(threadName + "-forFile", 99, false));
             name[i] = threadName;
         }
         threadNameArray = name;
@@ -59,7 +59,7 @@ public class TestClientMultiCreate {
             public void run() {
                 try {
                     buildSubDir("/" + Thread.currentThread().getName());
-                    latchCreate.countDown();
+                    latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -69,10 +69,9 @@ public class TestClientMultiCreate {
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
-        latchCreate.await();
+        latchDir.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("create ok, thread count is %s time: %s", threadCount, (end - start)));
-        latchForOps.countDown();
+        logger.info(String.format("create dir, thread count is %s time: %s", threadCount, (end - start)));
     }
 
     public void testMultiCreateFile() throws InterruptedException, RemoteException {
@@ -82,7 +81,7 @@ public class TestClientMultiCreate {
             public void run() {
                 try {
                     buildSubFile("/" + Thread.currentThread().getName() + "-forFile");
-                    latchCreate.countDown();
+                    latchFile.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -92,9 +91,9 @@ public class TestClientMultiCreate {
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
-        latchFind.await();
+        latchFile.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("find ok, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("create file, thread count is %s time: %s", threadCount, (end - start)));
     }
 
     private void buildSubDir(String parentDir) throws RemoteException {
@@ -108,6 +107,21 @@ public class TestClientMultiCreate {
             clientService.createFileMd(parentDir, "file" + i, getMdAttr("file" + i, i, false));
         }
     }
+
+    @Test
+    public void testListDir() throws RemoteException {
+        long start = System.currentTimeMillis();
+        clientService.createDirMd("/","d1",getMdAttr("d1",1,true));
+        clientService.createDirMd("/","d3",getMdAttr("d3",1,true));
+        clientService.createDirMd("/d1","d2",getMdAttr("d2",1,true));
+        logger.info(clientService.listDir("/d1").toString());
+        clientService.deleteDir("/","d1");
+        logger.info(clientService.listDir("/d1").toString());
+        logger.info(clientService.listDir("/").toString());
+        long end = System.currentTimeMillis();
+        logger.info(String.format("list dir / ok, thread count is %s time: %s",1,(end - start)));
+    }
+
     private MdAttr getMdAttr(String name, int size, boolean isDir) {
         MdAttr mdAttr = new MdAttr();
         mdAttr.setName(name);

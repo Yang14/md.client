@@ -35,7 +35,7 @@ public class ClientServiceImpl implements ClientService {
     public boolean createDirMd(String parentDirPath, String dirName, MdAttr mdAttr) throws RemoteException {
         MdPosCacheTool.removeMdPosList(parentDirPath);
         MdPos mdPos = indexOps.createDirIndex(parentDirPath, dirName);
-        if (mdPos == null){
+        if (mdPos == null) {
             logger.error("create dir error: parentDirPath:" + parentDirPath + ",dirName:" + dirName);
             return false;
         }
@@ -95,16 +95,17 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public boolean deleteDir(String parentPath,String dirName) throws RemoteException {
+    public boolean deleteDir(String parentPath, String dirName) throws RemoteException {
         List<MdPos> mdPosList = getMdPosListByPath(parentPath);
-        boolean renameResult = false;
+        boolean deleteResult;
         for (MdPos mdPos : mdPosList) {
-            renameResult = ssdbService.deleteMd(mdPos, dirName);
-            if (renameResult) {
+            deleteResult = ssdbService.deleteMd(mdPos, dirName);
+            if (deleteResult) {
                 break;
             }
         }
-        return indexOps.deleteDir(parentPath+dirName);
+        String separator = parentPath.equals("/") ? "" : "/";
+        return indexOps.deleteDir(parentPath + separator + dirName);
     }
 
     @Override

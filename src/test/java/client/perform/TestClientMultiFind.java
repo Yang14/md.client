@@ -1,40 +1,21 @@
 package client.perform;
 
-import client.service.ClientService;
-import client.service.impl.ClientServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Mr-yang on 16-2-18.
  */
-public class TestClientMultiFind {
+public class TestClientMultiFind extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("TestClient");
-
-    private ClientService clientService = new ClientServiceImpl();
-
-    private int threadCount = 16;
-    private int count = 10000;
-    private CountDownLatch latchDir = new CountDownLatch(threadCount);
-    private CountDownLatch latchFile = new CountDownLatch(threadCount);
-
-    private CountDownLatch latchForOps = new CountDownLatch(1);
-
-    private String[] threadNameArray;
 
     @Before
     public void setUp() throws RemoteException {
-        String[] name = new String[threadCount];
-        for (int i = 0; i < threadCount; i++) {
-            String threadName = "t" + i;
-            name[i] = threadName;
-        }
-        threadNameArray = name;
+        super.setUp();
     }
 
     @Test

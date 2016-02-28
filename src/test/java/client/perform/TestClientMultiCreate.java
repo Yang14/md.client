@@ -1,6 +1,5 @@
 package client.perform;
 
-import base.md.MdAttr;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -13,6 +12,10 @@ import java.rmi.RemoteException;
  */
 public class TestClientMultiCreate extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("TestClient");
+
+    public TestClientMultiCreate(int threadCount) {
+        super(threadCount);
+    }
 
     @Before
     public void setUp() throws RemoteException {
@@ -119,12 +122,4 @@ public class TestClientMultiCreate extends BaseMultiMdTest {
         logger.info(clientService.listDir("/").toString());
     }
 
-    private MdAttr getMdAttr(String name, int size, boolean isDir) {
-        MdAttr mdAttr = new MdAttr();
-        mdAttr.setName(name);
-        mdAttr.setSize(size);
-        mdAttr.setType(isDir);
-        // mdAttr.setCreateTime(System.currentTimeMillis());
-        return mdAttr;
-    }
 }

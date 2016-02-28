@@ -13,6 +13,10 @@ import java.rmi.RemoteException;
 public class TestClientMultiFind extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("TestClient");
 
+    public TestClientMultiFind(int threadCount) {
+        super(threadCount);
+    }
+
     @Before
     public void setUp() throws RemoteException {
         super.setUp();

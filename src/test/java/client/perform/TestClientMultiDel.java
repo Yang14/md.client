@@ -13,6 +13,10 @@ import java.rmi.RemoteException;
 public class TestClientMultiDel extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("TestClientMultiDel");
 
+    public TestClientMultiDel(int threadCount) {
+        super(threadCount);
+    }
+
     @Before
     public void setUp() throws RemoteException {
         super.setUp();

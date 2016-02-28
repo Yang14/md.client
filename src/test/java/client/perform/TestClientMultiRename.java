@@ -13,6 +13,10 @@ import java.rmi.RemoteException;
 public class TestClientMultiRename extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("TestClientMultiRename");
 
+    public TestClientMultiRename(int threadCount) {
+        super(threadCount);
+    }
+
     @Before
     public void setUp() throws RemoteException {
         super.setUp();

@@ -27,6 +27,7 @@ public class TestClientMultiRename extends BaseMultiMdTest {
 
     @Test
     public void testMultiRenameDir() throws InterruptedException {
+        latchForOps.await();
         Runnable run = new Runnable() {
             @Override
             public void run() {
@@ -78,12 +79,6 @@ public class TestClientMultiRename extends BaseMultiMdTest {
     private void renameSubFile(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {
             clientService.renameFile(parentDir, "file" + i, "r-file" + i);
-        }
-    }
-
-    private void delFile(String parentDir) throws RemoteException {
-        for (int i = 0; i < count; i++) {
-            clientService.deleteFile(parentDir, "file" + i);
         }
     }
 

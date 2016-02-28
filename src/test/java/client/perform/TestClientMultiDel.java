@@ -35,6 +35,7 @@ public class TestClientMultiDel extends BaseMultiMdTest {
 
     @Test
     public void testMultiDelDir() throws InterruptedException {
+        latchForOps.await();
         Runnable run = new Runnable() {
             @Override
             public void run() {

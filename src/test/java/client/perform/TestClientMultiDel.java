@@ -19,28 +19,19 @@ public class TestClientMultiDel extends BaseMultiMdTest {
     }
 
     @Test
-    public void testClearMd() throws InterruptedException, RemoteException {
-        long start = System.currentTimeMillis();
-        clientService.deleteDir("/", "");
-        long end = System.currentTimeMillis();
-        logger.info(String.format("delete ok, thread count is %s time: %s", 1, (end - start)));
-    }
-
-    @Test
     public void testMultiDel() throws InterruptedException {
         testMultiDelFile();
         latchForOps.countDown();
         testMultiDelDir();
     }
 
-    @Test
     public void testMultiDelDir() throws InterruptedException {
         latchForOps.await();
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
-                    clientService.deleteDir("/", Thread.currentThread().getName());
+                    delDir("/" + Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -56,14 +47,13 @@ public class TestClientMultiDel extends BaseMultiMdTest {
         logger.info(String.format("del dir, thread count is %s time: %s", threadCount, (end - start)));
     }
 
-    @Test
     public void testMultiDelFile() throws InterruptedException {
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
                     delFile("/" + Thread.currentThread().getName() + "-forFile");
-                    latchDir.countDown();
+                    latchFile.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -73,9 +63,15 @@ public class TestClientMultiDel extends BaseMultiMdTest {
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
-        latchDir.await();
+        latchFile.await();
         long end = System.currentTimeMillis();
         logger.info(String.format("del file, thread count is %s time: %s", threadCount, (end - start)));
+    }
+
+    private void delDir(String parentDir) throws RemoteException {
+        for (int i = 0; i < count; i++) {
+            clientService.deleteDir(parentDir, "dir" + i);
+        }
     }
 
     private void delFile(String parentDir) throws RemoteException {

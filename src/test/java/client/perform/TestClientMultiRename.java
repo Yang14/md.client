@@ -55,7 +55,7 @@ public class TestClientMultiRename extends BaseMultiMdTest {
             public void run() {
                 try {
                     renameSubFile("/" + Thread.currentThread().getName() + "-forFile");
-                    latchDir.countDown();
+                    latchFile.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -65,7 +65,7 @@ public class TestClientMultiRename extends BaseMultiMdTest {
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
-        latchDir.await();
+        latchFile.await();
         long end = System.currentTimeMillis();
         logger.info(String.format("rename file, thread count is %s time: %s", threadCount, (end - start)));
     }

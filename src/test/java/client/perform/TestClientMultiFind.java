@@ -77,4 +77,10 @@ public class TestClientMultiFind extends BaseMultiMdTest {
             clientService.findFileMd(parentDir, "file" + i);
         }
     }
+
+    @Test
+    public void testListDir() throws RemoteException {
+        logger.info(clientService.listDir("/t1").toString());
+//        logger.info(clientService.findFileMd("/","t1").toString());
+    }
 }

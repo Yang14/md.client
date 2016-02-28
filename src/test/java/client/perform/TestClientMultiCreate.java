@@ -108,6 +108,17 @@ public class TestClientMultiCreate extends BaseMultiMdTest {
         logger.info(String.format("list dir / ok, thread count is %s time: %s",1,(end - start)));
     }
 
+    @Test
+    public void testRenameDir() throws RemoteException {
+        clientService.createDirMd("/","d1",getMdAttr("d1",1,true));
+        clientService.createDirMd("/","d3",getMdAttr("d3",1,true));
+        clientService.createDirMd("/d1","d2",getMdAttr("d2",1,true));
+        logger.info(clientService.listDir("/d1").toString());
+        clientService.renameDir("/","d1","r-d1");
+        logger.info(clientService.listDir("/r-d1").toString());
+        logger.info(clientService.listDir("/").toString());
+    }
+
     private MdAttr getMdAttr(String name, int size, boolean isDir) {
         MdAttr mdAttr = new MdAttr();
         mdAttr.setName(name);

@@ -61,7 +61,7 @@ public class ClientServiceImpl implements ClientService {
         List<MdAttr> mdAttrList = new ArrayList<MdAttr>();
         for (MdPos mdPos : mdPosList) {
             List<MdAttr> partMdAttrList = ssdbService.listDir(mdPos);
-            if (partMdAttrList != null) {
+            if (partMdAttrList.size() > 0) {
                 mdAttrList.addAll(partMdAttrList);
             }
         }
@@ -70,7 +70,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public boolean renameDir(String parentDirPath, String oldName, String newName) throws RemoteException {
-        List<MdPos> mdPosList = getMdPosListFromRenameDir(parentDirPath, oldName, newName);
+        String separator = parentDirPath.equals("/") ? "" : "/";
+        MdPosCacheTool.removeMdPosList(parentDirPath + separator + oldName);
+        List<MdPos> mdPosList = indexOps.renameDirIndex(parentDirPath, oldName, newName);
         boolean renameResult = false;
         for (MdPos mdPos : mdPosList) {
             renameResult = ssdbService.renameMd(mdPos, oldName, newName);
@@ -96,6 +98,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public boolean deleteDir(String parentPath, String dirName) throws RemoteException {
+        MdPosCacheTool.removeMdPosList(parentPath);
         List<MdPos> mdPosList = getMdPosListByPath(parentPath);
         boolean deleteResult;
         for (MdPos mdPos : mdPosList) {
@@ -125,15 +128,9 @@ public class ClientServiceImpl implements ClientService {
         List<MdPos> mdPosList = MdPosCacheTool.getMdPosListFromCache(path);
         if (mdPosList == null) {
             mdPosList = indexOps.getMdPosList(path);
-            MdPosCacheTool.setMdPosListToCache(path, mdPosList);
-        }
-        return mdPosList;
-    }
-
-    private List<MdPos> getMdPosListFromRenameDir(String path, String oldName, String newName) throws RemoteException {
-        List<MdPos> mdPosList = MdPosCacheTool.getMdPosListFromCache(path);
-        if (mdPosList == null) {
-            mdPosList = indexOps.renameDirIndex(path, oldName, newName);
+            if (mdPosList == null) {
+                return new ArrayList<MdPos>();
+            }
             MdPosCacheTool.setMdPosListToCache(path, mdPosList);
         }
         return mdPosList;

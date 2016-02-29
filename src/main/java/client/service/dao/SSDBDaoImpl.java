@@ -47,21 +47,15 @@ public class SSDBDaoImpl implements SSDBDao {
     public boolean renameMd(MdPos mdPos, String oldName, String newName) {
         SSDB ssdb = ConnTool.getSSDB(mdPos);
         long dCode = mdPos.getdCode();
-        Response response = ssdb.hexists(dCode, oldName);
-        if (!response.ok()) {
-            return false;
-        }
         MdAttr mdAttr = JSON.parseObject(ssdb.hget(dCode, oldName).asString(), MdAttr.class);
         mdAttr.setName(newName);
         ssdb.hdel(dCode, oldName);
-        response = ssdb.hset(dCode, newName, JSON.toJSONString(mdAttr));
-        return response.ok();
+        return ssdb.hset(dCode, newName, JSON.toJSONString(mdAttr)).ok();
     }
 
     public boolean deleteMd(MdPos mdPos, String name) {
         SSDB ssdb = ConnTool.getSSDB(mdPos);
-        long dCode = mdPos.getdCode();
-        return !ssdb.hdel(dCode, name).notFound();
+        return !ssdb.hdel(mdPos.getdCode(), name).notFound();
     }
 
     @Override

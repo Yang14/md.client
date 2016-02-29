@@ -20,7 +20,7 @@ public class TestClientMultiDel extends BaseMultiMdTest {
 
     @Test
     public void testMultiDel() throws InterruptedException {
-       // testMultiDelFile();
+       testMultiDelFile();
         latchForOps.countDown();
         testMultiDelDir();
     }
@@ -70,13 +70,13 @@ public class TestClientMultiDel extends BaseMultiMdTest {
 
     private void delDir(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {
-            clientService.deleteDir(parentDir, "dir" + i);
+            clientService.deleteDir(parentDir, "r-dir" + i);
         }
     }
 
     private void delFile(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {
-            clientService.deleteFile(parentDir, "file" + i);
+            clientService.deleteFile(parentDir, "r-file" + i);
         }
     }
 

@@ -19,7 +19,7 @@ public class BaseMultiMdTest {
     public ClientService clientService = new ClientServiceImpl();
 
     public int threadCount = 15;
-    public int count = 100000 ;
+    public int count = 100000;
     public CountDownLatch latchDir = new CountDownLatch(threadCount);
     public CountDownLatch latchFile = new CountDownLatch(threadCount);
 
@@ -50,12 +50,17 @@ public class BaseMultiMdTest {
         int i = 1;
         String name = "";
         for (MdAttr mdAttr : mdAttrs) {
-            name += mdAttr.getName() + ",";
+            if (mdAttr.getType()) {
+                name += "[" + mdAttr.getName() + "],";
+            } else {
+                name += mdAttr.getName() + ",";
+            }
             if (i++ % 100 == 0) {
                 logger.info(name);
                 name = "";
             }
         }
+        logger.info(name);
     }
 
 }

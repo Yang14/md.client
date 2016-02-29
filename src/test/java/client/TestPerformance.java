@@ -30,10 +30,10 @@ public class TestPerformance {
 
     private void testWithThreadCount(int count) throws RemoteException, InterruptedException {
         logger.info(String.format("--------------begin test with %s-----------------",count));
-        new TestClientMultiCreate(count).testMultiCreate();
-        new TestClientMultiFind(count).testMultiFind();
-        new TestClientMultiRename(count).testMultiRename();
-        new TestClientMultiDel(count).testMultiDel();
+        new TestClientMultiCreate().testMultiCreate();
+        new TestClientMultiFind().testMultiFind();
+        new TestClientMultiRename().testMultiRename();
+        new TestClientMultiDel().testMultiDel();
         logger.info(String.format("--------------end test -----------------"));
     }
 

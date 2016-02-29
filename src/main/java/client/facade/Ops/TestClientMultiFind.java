@@ -1,4 +1,4 @@
-package client.perform;
+package client.facade.Ops;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,9 +10,8 @@ import java.rmi.RemoteException;
 /**
  * Created by Mr-yang on 16-2-18.
  */
-public class TestClientMultiRename extends BaseMultiMdTest {
-    private static Logger logger = LoggerFactory.getLogger("ClientMultiRename");
-
+public class TestClientMultiFind extends BaseMultiMdTest {
+    private static Logger logger = LoggerFactory.getLogger("TestClient");
 
     @Before
     public void setUp() throws RemoteException {
@@ -20,19 +19,18 @@ public class TestClientMultiRename extends BaseMultiMdTest {
     }
 
     @Test
-    public void testMultiRename() throws InterruptedException {
-        testMultiRenameFile();
+    public void testMultiFind() throws InterruptedException, RemoteException {
+        testMultiListDir();
         latchForOps.countDown();
-        testMultiRenameDir();
+        testMultiFindFile();
     }
 
-    public void testMultiRenameDir() throws InterruptedException {
-        latchForOps.await();
+    public void testMultiListDir() throws InterruptedException, RemoteException {
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
-                    renameSubDir("/" + Thread.currentThread().getName());
+                    listDir("/" + Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -45,15 +43,15 @@ public class TestClientMultiRename extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("rename dir, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("list dir, thread count is %s time: %s", threadCount, (end - start)));
     }
-
-    public void testMultiRenameFile() throws InterruptedException {
+    public void testMultiFindFile() throws InterruptedException, RemoteException {
+        latchForOps.await();
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
-                    renameSubFile("/" + Thread.currentThread().getName() + "-forFile");
+                    findFile("/" + Thread.currentThread().getName() + "-forFile");
                     latchFile.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -66,19 +64,26 @@ public class TestClientMultiRename extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("rename file, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("find file, thread count is %s time: %s", threadCount, (end - start)));
     }
-
-    private void renameSubDir(String parentDir) throws RemoteException {
+    private void listDir(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {
-            clientService.renameDir(parentDir, "dir" + i, "r-dir" + i);
+            clientService.listDir(parentDir+ "/dir" + i);
         }
     }
 
-    private void renameSubFile(String parentDir) throws RemoteException {
+    private void findFile(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {
-            clientService.renameFile(parentDir, "file" + i, "r-file" + i);
+            clientService.findFileMd(parentDir, "file" + i);
         }
     }
 
+    public void testListDir() throws RemoteException {
+        printMdList(clientService.listDir("/t2"));
+//        for (int i = 0; i < count; i++) {
+//            clientService.renameDir("/t1", "dir" + i, "r-dir" + i);
+//        }
+//        printMdList(clientService.listDir("/t1"));
+//        logger.info(clientService.findFileMd("/","t1").toString());
+    }
 }

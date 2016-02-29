@@ -11,7 +11,7 @@ import java.rmi.RemoteException;
  * Created by Mr-yang on 16-2-18.
  */
 public class TestClientMultiDel extends BaseMultiMdTest {
-    private static Logger logger = LoggerFactory.getLogger("TestClientMultiDel");
+    private static Logger logger = LoggerFactory.getLogger("ClientMultiDel");
 
     @Before
     public void setUp() throws RemoteException {

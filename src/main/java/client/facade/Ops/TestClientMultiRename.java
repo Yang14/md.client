@@ -1,4 +1,4 @@
-package client.perform;
+package client.facade.Ops;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import java.rmi.RemoteException;
  * Created by Mr-yang on 16-2-18.
  */
 public class TestClientMultiRename extends BaseMultiMdTest {
-    private static Logger logger = LoggerFactory.getLogger("ClientMultiRename");
+    private static Logger logger = LoggerFactory.getLogger("TestClientMultiRename");
 
 
     @Before

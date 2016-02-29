@@ -16,7 +16,7 @@ import java.rmi.RemoteException;
  * Created by Mr-yang on 16-2-25.
  */
 public class TestPerformance {
-    private static Logger logger = LoggerFactory.getLogger("TestPerformance");
+    private static Logger logger = LoggerFactory.getLogger("SystemPerformance");
 
     private ClientService clientService = new ClientServiceImpl();
 

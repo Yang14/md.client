@@ -1,7 +1,5 @@
-package client.perform;
+package client.facade.ops;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,16 +8,18 @@ import java.rmi.RemoteException;
 /**
  * Created by Mr-yang on 16-2-18.
  */
-public class TestClientMultiRename extends BaseMultiMdTest {
+public class ClientMultiRename extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("ClientMultiRename");
 
-
-    @Before
-    public void setUp() throws RemoteException {
-        super.setUp();
+    public ClientMultiRename() {
+        try {
+            super.setUp();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Test
+
     public void testMultiRename() throws InterruptedException {
         testMultiRenameFile();
         latchForOps.countDown();

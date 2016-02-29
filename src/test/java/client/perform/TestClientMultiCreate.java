@@ -1,6 +1,5 @@
 package client.perform;
 
-import base.md.MdAttr;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -117,12 +116,4 @@ public class TestClientMultiCreate extends BaseMultiMdTest {
         logger.info(clientService.listDir("/").toString());
     }
 
-    private MdAttr getMdAttr(String name, int size, boolean isDir) {
-        MdAttr mdAttr = new MdAttr();
-        mdAttr.setName(name);
-        mdAttr.setSize(size);
-        mdAttr.setType(isDir);
-        // mdAttr.setCreateTime(System.currentTimeMillis());
-        return mdAttr;
-    }
 }

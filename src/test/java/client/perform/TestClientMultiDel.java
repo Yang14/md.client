@@ -20,7 +20,7 @@ public class TestClientMultiDel extends BaseMultiMdTest {
 
     @Test
     public void testMultiDel() throws InterruptedException {
-        testMultiDelFile();
+       // testMultiDelFile();
         latchForOps.countDown();
         testMultiDelDir();
     }

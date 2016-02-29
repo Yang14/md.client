@@ -25,7 +25,6 @@ public class TestClientMultiRename extends BaseMultiMdTest {
         testMultiRenameDir();
     }
 
-    @Test
     public void testMultiRenameDir() throws InterruptedException {
         latchForOps.await();
         Runnable run = new Runnable() {
@@ -48,7 +47,6 @@ public class TestClientMultiRename extends BaseMultiMdTest {
         logger.info(String.format("rename dir, thread count is %s time: %s", threadCount, (end - start)));
     }
 
-    @Test
     public void testMultiRenameFile() throws InterruptedException {
         Runnable run = new Runnable() {
             @Override

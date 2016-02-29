@@ -78,7 +78,6 @@ public class TestClientMultiFind extends BaseMultiMdTest {
         }
     }
 
-    @Test
     public void testListDir() throws RemoteException {
         printMdList(clientService.listDir("/t2"));
 //        for (int i = 0; i < count; i++) {

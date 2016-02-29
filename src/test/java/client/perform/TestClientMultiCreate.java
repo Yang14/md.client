@@ -94,7 +94,6 @@ public class TestClientMultiCreate extends BaseMultiMdTest {
         }
     }
 
-    @Test
     public void testListDir() throws RemoteException {
         long start = System.currentTimeMillis();
         clientService.createDirMd("/","d1",getMdAttr("d1",1,true));
@@ -108,7 +107,6 @@ public class TestClientMultiCreate extends BaseMultiMdTest {
         logger.info(String.format("list dir / ok, thread count is %s time: %s",1,(end - start)));
     }
 
-    @Test
     public void testRenameDir() throws RemoteException {
         clientService.createDirMd("/","d1",getMdAttr("d1",1,true));
         clientService.createDirMd("/","d3",getMdAttr("d3",1,true));

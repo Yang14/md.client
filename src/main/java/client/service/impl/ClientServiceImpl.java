@@ -36,7 +36,7 @@ public class ClientServiceImpl implements ClientService {
         MdPosCacheTool.removeMdPosList(parentDirPath);
         MdPos mdPos = indexOps.createDirIndex(parentDirPath, dirName);
         if (mdPos == null) {
-            logger.error("create dir error: parentDirPath:" + parentDirPath + ",dirName:" + dirName);
+            //logger.error("create dir error: parentDirPath:" + parentDirPath + ",dirName:" + dirName);
             return false;
         }
         return ssdbService.insertMd(mdPos, dirName, mdAttr);

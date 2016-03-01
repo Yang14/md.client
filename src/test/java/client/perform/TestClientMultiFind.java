@@ -43,7 +43,7 @@ public class TestClientMultiFind extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("list dir, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("list dir count %s, thread count is %s time: %s", count,threadCount, (end - start)));
     }
     public void testMultiFindFile() throws InterruptedException, RemoteException {
         latchForOps.await();
@@ -64,7 +64,7 @@ public class TestClientMultiFind extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("find file, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("find file count %s, thread count is %s time: %s",count, threadCount, (end - start)));
     }
     private void listDir(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {

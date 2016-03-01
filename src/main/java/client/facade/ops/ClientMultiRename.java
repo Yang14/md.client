@@ -8,34 +8,31 @@ import java.rmi.RemoteException;
 /**
  * Created by Mr-yang on 16-2-18.
  */
-public class ClientMultiDel extends BaseMultiMdTest {
-    private static Logger logger = LoggerFactory.getLogger("ClientMultiDel");
+public class ClientMultiRename extends BaseMultiMdTest {
+    private static Logger logger = LoggerFactory.getLogger("ClientMultiRename");
 
-    public ClientMultiDel() {
+    public ClientMultiRename() {
         try {
-            setUp();
+            super.setUp();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
-    public void setUp() throws RemoteException {
-        super.setUp();
-    }
 
-    public void testMultiDel() throws InterruptedException {
-       testMultiDelFile();
+    public void testMultiRename() throws InterruptedException {
+        testMultiRenameFile();
         latchForOps.countDown();
-        testMultiDelDir();
+        testMultiRenameDir();
     }
 
-    public void testMultiDelDir() throws InterruptedException {
+    public void testMultiRenameDir() throws InterruptedException {
         latchForOps.await();
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
-                    delDir("/" + Thread.currentThread().getName());
+                    renameSubDir("/" + Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -48,15 +45,15 @@ public class ClientMultiDel extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("del dir, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("rename dir count %s, thread count is %s time: %s", count,threadCount, (end - start)));
     }
 
-    public void testMultiDelFile() throws InterruptedException {
+    public void testMultiRenameFile() throws InterruptedException {
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
-                    delFile("/" + Thread.currentThread().getName() + "-forFile");
+                    renameSubFile("/" + Thread.currentThread().getName() + "-forFile");
                     latchFile.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -69,18 +66,18 @@ public class ClientMultiDel extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("del file, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("rename file count %s, thread count is %s time: %s",count, threadCount, (end - start)));
     }
 
-    private void delDir(String parentDir) throws RemoteException {
+    private void renameSubDir(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {
-            clientService.deleteDir(parentDir, "r-dir" + i);
+            clientService.renameDir(parentDir, "dir" + i, "r-dir" + i);
         }
     }
 
-    private void delFile(String parentDir) throws RemoteException {
+    private void renameSubFile(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {
-            clientService.deleteFile(parentDir, "r-file" + i);
+            clientService.renameFile(parentDir, "file" + i, "r-file" + i);
         }
     }
 

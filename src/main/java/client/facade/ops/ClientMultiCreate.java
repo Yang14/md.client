@@ -60,7 +60,7 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("create dir, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("create dir count %s, thread count is %s time: %s",count, threadCount, (end - start)));
     }
 
     public void testMultiCreateFile() throws InterruptedException, RemoteException {
@@ -82,7 +82,7 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("create file, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("create file count %s, thread count is %s time: %s",count, threadCount, (end - start)));
     }
 
     private void buildSubDir(String parentDir) throws RemoteException {

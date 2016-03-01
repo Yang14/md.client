@@ -1,7 +1,5 @@
-package client.facade.Ops;
+package client.facade.ops;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,15 +8,17 @@ import java.rmi.RemoteException;
 /**
  * Created by Mr-yang on 16-2-18.
  */
-public class TestClientMultiFind extends BaseMultiMdTest {
+public class ClientMultiFind extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("TestClient");
 
-    @Before
-    public void setUp() throws RemoteException {
-        super.setUp();
+    public ClientMultiFind() {
+        try {
+            super.setUp();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Test
     public void testMultiFind() throws InterruptedException, RemoteException {
         testMultiListDir();
         latchForOps.countDown();
@@ -43,7 +43,7 @@ public class TestClientMultiFind extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("list dir, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("list dir count %s, thread count is %s time: %s",count, threadCount, (end - start)));
     }
     public void testMultiFindFile() throws InterruptedException, RemoteException {
         latchForOps.await();
@@ -64,7 +64,7 @@ public class TestClientMultiFind extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("find file, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("find file count %s, thread count is %s time: %s",count, threadCount, (end - start)));
     }
     private void listDir(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {

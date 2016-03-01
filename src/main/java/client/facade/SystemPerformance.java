@@ -15,11 +15,20 @@ import java.rmi.RemoteException;
 public class SystemPerformance {
     private static Logger logger = LoggerFactory.getLogger("SystemPerformance");
     public static int threadCount;
+    public static int count;
 
     public static void testPerformance() throws RemoteException, InterruptedException {
-        int[] countArray = new int[]{1, 2, 4, 8, 16, 32, 64};
+//        int[] countArray = new int[]{1, 2, 4, 8, 16, 32, 64};
+        int[] countArray = new int[]{32};
         for (int i = 0; i < countArray.length; i++) {
             threadCount = countArray[i];
+            if (threadCount <= 4){
+                count = 10000;
+            }else if(threadCount == 8){
+                count = 100000/threadCount;
+            }else {
+                count = 100000/threadCount;
+            }
             testWithThreadCount(threadCount);
         }
     }

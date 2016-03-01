@@ -20,7 +20,7 @@ public class BaseMultiMdTest {
     public ClientService clientService = new ClientServiceImpl();
 
     public int threadCount = SystemPerformance.threadCount;
-    public int count = 10000/threadCount;
+    public int count = SystemPerformance.count;
     public CountDownLatch latchDir = new CountDownLatch(threadCount);
     public CountDownLatch latchFile = new CountDownLatch(threadCount);
 

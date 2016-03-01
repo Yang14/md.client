@@ -1,7 +1,5 @@
-package client.facade.Ops;
+package client.facade.ops;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,15 +8,21 @@ import java.rmi.RemoteException;
 /**
  * Created by Mr-yang on 16-2-18.
  */
-public class TestClientMultiDel extends BaseMultiMdTest {
-    private static Logger logger = LoggerFactory.getLogger("TestClientMultiDel");
+public class ClientMultiDel extends BaseMultiMdTest {
+    private static Logger logger = LoggerFactory.getLogger("ClientMultiDel");
 
-    @Before
+    public ClientMultiDel() {
+        try {
+            setUp();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void setUp() throws RemoteException {
         super.setUp();
     }
 
-    @Test
     public void testMultiDel() throws InterruptedException {
        testMultiDelFile();
         latchForOps.countDown();
@@ -44,7 +48,7 @@ public class TestClientMultiDel extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("del dir, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("del dir count %s, thread count is %s time: %s",count, threadCount, (end - start)));
     }
 
     public void testMultiDelFile() throws InterruptedException {
@@ -65,7 +69,7 @@ public class TestClientMultiDel extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("del file, thread count is %s time: %s", threadCount, (end - start)));
+        logger.info(String.format("del file count %s, thread count is %s time: %s",count, threadCount, (end - start)));
     }
 
     private void delDir(String parentDir) throws RemoteException {

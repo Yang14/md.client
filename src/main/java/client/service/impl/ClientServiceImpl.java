@@ -21,20 +21,25 @@ import java.util.List;
 public class ClientServiceImpl implements ClientService {
     private static Logger logger = LoggerFactory.getLogger("ClientServiceImpl");
     private static IndexOpsService indexOps = ConnTool.getIndexOpsService();
+    private static ThreadLocal<IndexOpsService> indexOpsHolder = new ThreadLocal<IndexOpsService>(){
+        public IndexOpsService initialValue(){
+            return ConnTool.getIndexOpsService();
+        }
+    };
 
     private static SSDBDao ssdbService = new SSDBDaoImpl();
 
     @Override
     public boolean createFileMd(String parentDirPath, String fileName, MdAttr mdAttr) throws RemoteException {
         MdPosCacheTool.removeMdPosList(parentDirPath);
-        MdPos mdPos = indexOps.getMdPosForCreateFile(parentDirPath);
+        MdPos mdPos = indexOpsHolder.get().getMdPosForCreateFile(parentDirPath);
         return ssdbService.insertMd(mdPos, fileName, mdAttr);
     }
 
     @Override
     public boolean createDirMd(String parentDirPath, String dirName, MdAttr mdAttr) throws RemoteException {
         MdPosCacheTool.removeMdPosList(parentDirPath);
-        MdPos mdPos = indexOps.createDirIndex(parentDirPath, dirName);
+        MdPos mdPos = indexOpsHolder.get().createDirIndex(parentDirPath, dirName);
         if (mdPos == null) {
             //logger.error("create dir error: parentDirPath:" + parentDirPath + ",dirName:" + dirName);
             return false;
@@ -72,7 +77,7 @@ public class ClientServiceImpl implements ClientService {
     public boolean renameDir(String parentDirPath, String oldName, String newName) throws RemoteException {
         String separator = parentDirPath.equals("/") ? "" : "/";
         MdPosCacheTool.removeMdPosList(parentDirPath + separator + oldName);
-        List<MdPos> mdPosList = indexOps.renameDirIndex(parentDirPath, oldName, newName);
+        List<MdPos> mdPosList = indexOpsHolder.get().renameDirIndex(parentDirPath, oldName, newName);
         boolean renameResult = false;
         for (MdPos mdPos : mdPosList) {
             renameResult = ssdbService.renameMd(mdPos, oldName, newName);
@@ -108,7 +113,7 @@ public class ClientServiceImpl implements ClientService {
             }
         }
         String separator = parentPath.equals("/") ? "" : "/";
-        return indexOps.deleteDir(parentPath + separator + dirName);
+        return indexOpsHolder.get().deleteDir(parentPath + separator + dirName);
     }
 
     @Override
@@ -127,7 +132,7 @@ public class ClientServiceImpl implements ClientService {
     private List<MdPos> getMdPosListByPath(String path) throws RemoteException {
         List<MdPos> mdPosList = MdPosCacheTool.getMdPosListFromCache(path);
         if (mdPosList == null) {
-            mdPosList = indexOps.getMdPosList(path);
+            mdPosList = indexOpsHolder.get().getMdPosList(path);
             if (mdPosList == null) {
                 return new ArrayList<MdPos>();
             }

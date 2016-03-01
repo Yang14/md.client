@@ -18,8 +18,8 @@ public class BaseMultiMdTest {
 
     public ClientService clientService = new ClientServiceImpl();
 
-    public int threadCount = 15;
-    public int count = 100000;
+    public int threadCount = 32;
+    public int count = 100000/threadCount;
     public CountDownLatch latchDir = new CountDownLatch(threadCount);
     public CountDownLatch latchFile = new CountDownLatch(threadCount);
 

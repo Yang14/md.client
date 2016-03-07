@@ -19,7 +19,15 @@ public class TestFunction extends BaseMultiMdTest {
     String dirName = "f-dir";
     String fileName = "f-file";
     int count = 5;
+    @Test
+    public void testClearAll() throws RemoteException {
+        logger.info("begin to clean /.");
+        long start = System.currentTimeMillis();
+        clientService.deleteDir("/","");
+        long end = System.currentTimeMillis();
+        logger.info(String.format("clear dir /,,use time: %s",(end - start)));
 
+    }
     @Test
     public void testCreateDir() throws RemoteException {
         logger.info("begin test");

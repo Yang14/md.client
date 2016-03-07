@@ -27,10 +27,6 @@ public class SSDBDaoImpl implements SSDBDao {
 
     public MdAttr findFileMd(MdPos mdPos, String name) {
         SSDB ssdb = ConnTool.getSSDB(mdPos);
-        Response response = ssdb.hexists(mdPos.getdCode(), name);
-        if (!response.ok()) {
-            return null;
-        }
         return JSON.parseObject(ssdb.hget(mdPos.getdCode(), name).asString(), MdAttr.class);
     }
 

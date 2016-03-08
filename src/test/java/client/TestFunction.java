@@ -19,8 +19,28 @@ public class TestFunction extends BaseMultiMdTest {
     String dirName = "f-dir";
     String fileName = "f-file";
     int count = 5;
+
+    @Test
+    public void testClearPart() throws RemoteException {
+        clientService.createDirMd("/", "d1", getMdAttr("d1", 1, true));
+        clientService.createDirMd("/d1", "d2", getMdAttr("d2", 2, true));
+        clientService.createDirMd("/d1/d2", "d3", getMdAttr("d3", 3, true));
+        clientService.createDirMd("/d1/d2/d3", "d4", getMdAttr("d4", 4, true));
+        clientService.createDirMd("/d1/d2/d3/d4", "d5", getMdAttr("d5", 5, true));
+        clientService.createDirMd("/d1/d2/d3/d4/d5", "d6", getMdAttr("d6", 5, true));
+        logger.info(clientService.listDir("/d1").toString());
+        logger.info(clientService.listDir("/d1/d2").toString());
+        logger.info(clientService.listDir("/d1/d2/d3").toString());
+        logger.info("begin to clean /.");
+        long start = System.currentTimeMillis();
+//        clientService.deleteDir("/d1","d2");
+        long end = System.currentTimeMillis();
+        logger.info(String.format("clear dir /,,use time: %s",(end - start)));
+    }
+
     @Test
     public void testClearAll() throws RemoteException {
+        testClearPart();
         logger.info("begin to clean /.");
         long start = System.currentTimeMillis();
         clientService.deleteDir("/","");

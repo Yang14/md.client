@@ -79,15 +79,7 @@ public class ClientServiceImpl implements ClientService {
     public boolean renameDir(String parentDirPath, String oldName, String newName) throws RemoteException {
         String separator = parentDirPath.equals("/") ? "" : "/";
         MdPosCacheTool.removeMdPosList(parentDirPath + separator + oldName);
-        List<MdPos> mdPosList = indexOpsHolder.get().renameDirIndex(parentDirPath, oldName, newName);
-        boolean renameResult = false;
-        for (MdPos mdPos : mdPosList) {
-            renameResult = ssdbService.renameMd(mdPos, oldName, newName);
-            if (renameResult) {
-                break;
-            }
-        }
-        return renameResult;
+        return indexOpsHolder.get().renameDirIndex(parentDirPath, oldName, newName);
     }
 
     @Override

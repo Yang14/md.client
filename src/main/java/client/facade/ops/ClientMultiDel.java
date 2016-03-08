@@ -35,7 +35,7 @@ public class ClientMultiDel extends BaseMultiMdTest {
             @Override
             public void run() {
                 try {
-                    delDir("/" + Thread.currentThread().getName());
+                    clientService.deleteDir("/", Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();

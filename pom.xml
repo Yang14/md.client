@@ -68,7 +68,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass></mainClass>
+                            <mainClass>client.facade.SystemPerformance</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

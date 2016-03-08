@@ -17,14 +17,12 @@ public class SystemPerformance {
     public static int threadCount;
     public static int count;
 
-    public static void testPerformance() throws RemoteException, InterruptedException {
-        int[] countArray = new int[]{1, 2, 4, 8, 16, 32, 64};
-//        int[] countArray = new int[]{32};
+    public static void testPerformance(int[] countArray) throws RemoteException, InterruptedException {
         for (int i = 0; i < countArray.length; i++) {
             threadCount = countArray[i];
             switch (threadCount){
-                case 1:;
-                case 2:;
+                case 1:
+                case 2:
                 case 4:count = 10000;break;
                 case 8:count = 100000/8;break;
                 case 16:count = 100000;break;
@@ -46,7 +44,19 @@ public class SystemPerformance {
     }
 
     public static void main(String[] args) throws RemoteException, InterruptedException {
-        testPerformance();
+        if (args == null){
+            logger.info("need params : thread count.");
+            return;
+        }
+        int[] countArray = new int[args.length];
+        int i=0;
+        String inputParams = "";
+        for (String count : args){
+            inputParams += count +" ";
+            countArray[i++] = Integer.parseInt(count);
+        }
+        logger.info("input params:" + inputParams);
+        testPerformance(countArray);
     }
 
 }

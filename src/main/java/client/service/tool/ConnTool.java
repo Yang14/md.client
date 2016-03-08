@@ -36,7 +36,7 @@ public class ConnTool {
     public static SSDB getSSDB(MdPos mdPos) {
         SSDB ssdb = ssdbHolder.get(mdPos.getIp());
         if (ssdb == null) {
-            ssdb = SSDBs.pool(mdPos.getIp(), PortEnum.SSDB_PORT, 60000, null);
+            ssdb = SSDBs.pool(mdPos.getIp(), PortEnum.SSDB_PORT, 1000000, null);
             ssdbHolder.put(mdPos.getIp(), ssdb);
         }
         return ssdb;

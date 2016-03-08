@@ -43,7 +43,6 @@ public interface IndexOpsService extends Remote {
      * 4.由索引节点直接连接后端节点并执行删除哈希桶操作，完成目录删除功能
      * <p/>
      * 并未提供删除文件功能，因为删除文件将由客户端自行完成，先找到文件父目录索引获得MdPos后，删除文件
-     * TODO
      */
     public boolean deleteDir(String path) throws RemoteException;
 

@@ -31,8 +31,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public boolean createFileMd(String parentDirPath, String fileName, MdAttr mdAttr) throws RemoteException {
-        MdPosCacheTool.removeMdPosList(parentDirPath);
-        MdPos mdPos = indexOpsHolder.get().getMdPosForCreateFile(parentDirPath);
+        MdPos mdPos;
         List<MdPos> mdPosList = getMdPosListByPath(parentDirPath);
         mdPos = mdPosList.get(mdPosList.size()-1);
         return ssdbService.insertMd(mdPos, fileName, mdAttr);
@@ -40,7 +39,6 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public boolean createDirMd(String parentDirPath, String dirName, MdAttr mdAttr) throws RemoteException {
-        MdPosCacheTool.removeMdPosList(parentDirPath);
         MdPos mdPos = indexOpsHolder.get().createDirIndex(parentDirPath, dirName);
         if (mdPos == null) {
             //logger.error("create dir error: parentDirPath:" + parentDirPath + ",dirName:" + dirName);

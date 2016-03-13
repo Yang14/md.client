@@ -20,17 +20,25 @@ public class ClientMultiCreate extends BaseMultiMdTest {
     }
 
     public void setUp() throws RemoteException {
+        clientService.createDirMd("/", "d1", getMdAttr("d1", 1, true));
+        clientService.createDirMd("/d1", "d2", getMdAttr("d2", 2, true));
+        clientService.createDirMd("/d1/d2", "d3", getMdAttr("d3", 3, true));
+        clientService.createDirMd("/d1/d2/d3", "d4", getMdAttr("d4", 4, true));
+        clientService.createDirMd("/d1/d2/d3/d4", "d5", getMdAttr("d5", 5, true));
+        clientService.createDirMd("/d1/d2/d3/d4/d5", "d6", getMdAttr("d6", 5, true));
         String[] name = new String[threadCount];
         for (int i = 0; i < threadCount; i++) {
             String threadName = "t" + i;
             clientService.createDirMd("/", threadName, getMdAttr(threadName, 5, true));
-            //clientService.createDirMd("/", threadName + "-forFile", getMdAttr(threadName + "-forFile", 99, false));
+            clientService.createDirMd("/", threadName + "-forFile", getMdAttr(threadName + "-forFile", 99, true));
+
             name[i] = threadName;
         }
         for (int i = 0; i < threadCount; i++) {
             for (int j = 0; j < 100; j++) {
                 String threadName = "t" + i;
-                clientService.createDirMd("/", threadName + "-forFile" + j, getMdAttr(threadName + "-forFile", 99, false));
+                clientService.createDirMd("/"+ threadName + "-forFile","d"+j,
+                        getMdAttr("d"+j, 99, true));
             }
         }
         threadNameArray = name;
@@ -38,8 +46,8 @@ public class ClientMultiCreate extends BaseMultiMdTest {
 
     public void testMultiCreate() throws InterruptedException, RemoteException {
         testMultiCreateDir();
-        latchForOps.countDown();
-        testMultiCreateFile();
+        //latchForOps.countDown();
+        //testMultiCreateFile();
     }
 
     public void testMultiCreateDir() throws InterruptedException, RemoteException {
@@ -86,15 +94,22 @@ public class ClientMultiCreate extends BaseMultiMdTest {
     }
 
     private void buildSubDir(String parentDir) throws RemoteException {
-        for (int i = 0; i < count; i++) {
-            clientService.createDirMd(parentDir, "dir" + i, getMdAttr("dir" + i, i, true));
+        String path = "";
+        String temp = "";
+        for (int i = 0; i < 10; i++) {
+            temp = "s"+i;
+            clientService.createDirMd(parentDir+path, temp, getMdAttr(temp,i, true));
+            path+="/"+temp;
+            for (int j=0;j<100;j++) {
+                clientService.createDirMd(parentDir+path, "dir" + j, getMdAttr("dir" + j, i, true));
+            }
         }
     }
 
     private void buildSubFile(String parentDir) throws RemoteException {
-        for (int i = 0; i < threadCount; i++) {
+        for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 1000; j++) {
-                clientService.createFileMd(parentDir + i, "file" + j, getMdAttr("file" + j, j, false));
+                clientService.createFileMd(parentDir +"/d"+ i, "file" + j, getMdAttr("file" + j, j, false));
             }
         }
     }

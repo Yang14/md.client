@@ -20,7 +20,7 @@ public class ClientMultiFind extends BaseMultiMdTest {
     }
 
     public void testMultiFind() throws InterruptedException, RemoteException {
-        testMultiListDir();
+      //  testMultiListDir();
         latchForOps.countDown();
         testMultiFindFile();
     }
@@ -74,8 +74,14 @@ public class ClientMultiFind extends BaseMultiMdTest {
     }
 
     private void findFile(String parentDir) throws RemoteException {
-        for (int i = 0; i < count; i++) {
+        /*for (int i = 0; i < count; i++) {
             clientService.findFileMd(parentDir, "file" + i);
+        }*/
+
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 1000; j++) {
+                clientService.findFileMd(parentDir +"/d"+ i, "file" + j);
+            }
         }
     }
 

@@ -20,12 +20,6 @@ public class ClientMultiCreate extends BaseMultiMdTest {
     }
 
     public void setUp() throws RemoteException {
-        clientService.createDirMd("/", "d1", getMdAttr("d1", 1, true));
-        clientService.createDirMd("/d1", "d2", getMdAttr("d2", 2, true));
-        clientService.createDirMd("/d1/d2", "d3", getMdAttr("d3", 3, true));
-        clientService.createDirMd("/d1/d2/d3", "d4", getMdAttr("d4", 4, true));
-        clientService.createDirMd("/d1/d2/d3/d4", "d5", getMdAttr("d5", 5, true));
-        clientService.createDirMd("/d1/d2/d3/d4/d5", "d6", getMdAttr("d6", 5, true));
         String[] name = new String[threadCount];
         for (int i = 0; i < threadCount; i++) {
             String threadName = "t" + i;
@@ -45,7 +39,7 @@ public class ClientMultiCreate extends BaseMultiMdTest {
     }
 
     public void testMultiCreate() throws InterruptedException, RemoteException {
-//        testMultiCreateDir();
+        testMultiCreateDir();
         latchForOps.countDown();
         testMultiCreateFile();
     }
@@ -69,7 +63,7 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         latchDir.await();
         long end = System.currentTimeMillis();
         int count = 1000*threadCount;
-        logger.info(String.format("%s    %s",count, count*1000.0/(end - start)));
+        logger.info(String.format("create dir: %s    %s",count, count*1000.0/(end - start)));
     }
 
     public void testMultiCreateFile() throws InterruptedException, RemoteException {
@@ -92,7 +86,7 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         latchFile.await();
         long end = System.currentTimeMillis();
         int count = 100000*threadCount;
-        logger.info(String.format("%s    %s",count, count*1000.0/(end - start)));
+        logger.info(String.format("create file: %s    %s",count, count*1000.0/(end - start)));
     }
 
     private void buildSubDir(String parentDir) throws RemoteException {
@@ -114,29 +108,6 @@ public class ClientMultiCreate extends BaseMultiMdTest {
                 clientService.createFileMd(parentDir +"/d"+ i, "file" + j, getMdAttr("file" + j, j, false));
             }
         }
-    }
-
-    public void testListDir() throws RemoteException {
-        long start = System.currentTimeMillis();
-        clientService.createDirMd("/", "d1", getMdAttr("d1", 1, true));
-        clientService.createDirMd("/", "d3", getMdAttr("d3", 1, true));
-        clientService.createDirMd("/d1", "d2", getMdAttr("d2", 1, true));
-        logger.info(clientService.listDir("/d1").toString());
-        clientService.deleteDir("/", "d1");
-        logger.info(clientService.listDir("/d1").toString());
-        logger.info(clientService.listDir("/").toString());
-        long end = System.currentTimeMillis();
-        logger.info(String.format("list dir / ok, thread count is %s time: %s", 1, (end - start)));
-    }
-
-    public void testRenameDir() throws RemoteException {
-        clientService.createDirMd("/", "d1", getMdAttr("d1", 1, true));
-        clientService.createDirMd("/", "d3", getMdAttr("d3", 1, true));
-        clientService.createDirMd("/d1", "d2", getMdAttr("d2", 1, true));
-        logger.info(clientService.listDir("/d1").toString());
-        clientService.renameDir("/", "d1", "r-d1");
-        logger.info(clientService.listDir("/r-d1").toString());
-        logger.info(clientService.listDir("/").toString());
     }
 
 }

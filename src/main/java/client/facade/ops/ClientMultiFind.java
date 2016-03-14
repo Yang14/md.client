@@ -4,13 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Mr-yang on 16-2-18.
  */
 public class ClientMultiFind extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("TestClient");
-
+    private CountDownLatch latch = new CountDownLatch(1);
     public ClientMultiFind() {
         try {
             super.setUp();
@@ -20,18 +21,40 @@ public class ClientMultiFind extends BaseMultiMdTest {
     }
 
     public void testMultiFind() throws InterruptedException, RemoteException {
-      //  testMultiListDir();
+        operatorForListDir();
+        testMultiListDir();
         latchForOps.countDown();
         testMultiFindFile();
     }
 
-    public void testMultiListDir() throws InterruptedException, RemoteException {
+    public void operatorForListDir() throws InterruptedException, RemoteException {
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
-//                    listDir("/" + Thread.currentThread().getName());
-                    clientService.listDir("/" + Thread.currentThread().getName() + "-forFile");
+                    buildDirAndFile("/" + Thread.currentThread().getName());
+                    latchDir.countDown();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        for (int i = 0; i < threadCount; ++i) {
+            new Thread(run, threadNameArray[i]).start();
+        }
+        latchDir.await();
+        latch.countDown();
+        logger.info(String.format("pre dir for list"));
+    }
+
+    public void testMultiListDir() throws InterruptedException, RemoteException {
+        latch.await();
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    listDir("/" + Thread.currentThread().getName());
+//                    clientService.listDir("/" + Thread.currentThread().getName() + "-forFile");
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -44,8 +67,10 @@ public class ClientMultiFind extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("list dir count %s, thread count is %s time: %s",count, threadCount, (end - start)));
+        int count = 1000 * threadCount;
+        logger.info(String.format("find dir: %s    %s", count, count * 1000.0 / (end - start)));
     }
+
     public void testMultiFindFile() throws InterruptedException, RemoteException {
         latchForOps.await();
         Runnable run = new Runnable() {
@@ -65,32 +90,45 @@ public class ClientMultiFind extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("find file count %s, thread count is %s time: %s",count, threadCount, (end - start)));
-    }
-    private void listDir(String parentDir) throws RemoteException {
-        for (int i = 0; i < count; i++) {
-            clientService.listDir(parentDir+ "/dir" + i);
-        }
+        int count = 100000 * threadCount;
+        logger.info(String.format("find file: %s    %s", count, count * 1000.0 / (end - start)));
     }
 
-    private void findFile(String parentDir) throws RemoteException {
-        /*for (int i = 0; i < count; i++) {
-            clientService.findFileMd(parentDir, "file" + i);
-        }*/
-
-        for (int i = 0; i < 100; i++) {
+    private void buildDirAndFile(String parentDir) throws RemoteException {
+        String path = "";
+        String temp = "";
+        for (int i = 0; i < 10; i++) {
+            temp = "fs" + i;
+            clientService.createDirMd(parentDir + path, temp, getMdAttr(temp, i, true));
+            path += "/" + temp;
+            for (int j = 0; j < 100; j++) {
+                clientService.createDirMd(parentDir + path, "f-dir" + j, getMdAttr("f-dir" + j, i, true));
+            }
             for (int j = 0; j < 1000; j++) {
-                clientService.findFileMd(parentDir +"/d"+ i, "file" + j);
+                clientService.createFileMd(parentDir + path, "f-file" + j, getMdAttr("f-file" + j, i, true));
             }
         }
     }
 
-    public void testListDir() throws RemoteException {
-        printMdList(clientService.listDir("/t2"));
-//        for (int i = 0; i < count; i++) {
-//            clientService.renameDir("/t1", "dir" + i, "r-dir" + i);
-//        }
-//        printMdList(clientService.listDir("/t1"));
-//        logger.info(clientService.findFileMd("/","t1").toString());
+    private void listDir(String parentDir) throws RemoteException {
+        String path = "";
+        String temp = "";
+        for (int i = 0; i < 10; i++) {
+            temp = "fs" + i;
+            clientService.listDir(parentDir + path + "/" + temp);
+            path += "/" + temp;
+            for (int j = 0; j < 100; j++) {
+                clientService.listDir(parentDir + path + "/" + "f-dir" + j);
+            }
+        }
     }
+
+    private void findFile(String parentDir) throws RemoteException {
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 1000; j++) {
+                clientService.findFileMd(parentDir + "/d" + i, "file" + j);
+            }
+        }
+    }
+
 }

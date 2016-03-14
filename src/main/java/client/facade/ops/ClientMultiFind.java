@@ -33,7 +33,7 @@ public class ClientMultiFind extends BaseMultiMdTest {
             public void run() {
                 try {
                     buildDirAndFile("/" + Thread.currentThread().getName());
-                    latchDir.countDown();
+                    latchPer.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -42,7 +42,7 @@ public class ClientMultiFind extends BaseMultiMdTest {
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
-        latchDir.await();
+        latchPer.await();
         latch.countDown();
         logger.info(String.format("pre dir for list"));
     }
@@ -68,7 +68,7 @@ public class ClientMultiFind extends BaseMultiMdTest {
         latchDir.await();
         long end = System.currentTimeMillis();
         int count = 1000 * threadCount;
-        logger.info(String.format("find dir: %s    %s", count, count * 1000.0 / (end - start)));
+        logger.info(String.format("find dir: %s    %s    %s", count, count * 1000.0 / (end - start), (end - start)));
     }
 
     public void testMultiFindFile() throws InterruptedException, RemoteException {

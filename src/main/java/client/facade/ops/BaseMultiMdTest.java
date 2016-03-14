@@ -23,6 +23,7 @@ public class BaseMultiMdTest {
     public int count = SystemPerformance.count;
     public CountDownLatch latchDir = new CountDownLatch(threadCount);
     public CountDownLatch latchFile = new CountDownLatch(threadCount);
+    public CountDownLatch latchPer = new CountDownLatch(threadCount);
 
     public CountDownLatch latchForOps = new CountDownLatch(1);
 

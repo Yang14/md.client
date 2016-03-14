@@ -1,9 +1,11 @@
 package client.facade.ops;
 
+import base.md.MdAttr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -23,8 +25,8 @@ public class ClientMultiFind extends BaseMultiMdTest {
     public void testMultiFind() throws InterruptedException, RemoteException {
         operatorForListDir();
         testMultiListDir();
-        latchForOps.countDown();
-        testMultiFindFile();
+//        latchForOps.countDown();
+//        testMultiFindFile();
     }
 
     public void operatorForListDir() throws InterruptedException, RemoteException {
@@ -53,7 +55,7 @@ public class ClientMultiFind extends BaseMultiMdTest {
             @Override
             public void run() {
                 try {
-                    listDir("/" + Thread.currentThread().getName());
+                    listDir("/f" + Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -76,7 +78,7 @@ public class ClientMultiFind extends BaseMultiMdTest {
             @Override
             public void run() {
                 try {
-                    findFile("/" + Thread.currentThread().getName() + "-forFile");
+                    findFile("/f" + Thread.currentThread().getName() + "-forFile");
                     latchFile.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -103,8 +105,8 @@ public class ClientMultiFind extends BaseMultiMdTest {
             for (int j = 0; j < 100; j++) {
                 clientService.createDirMd(parentDir + path, "f-dir" + j, getMdAttr("f-dir" + j, i, true));
             }
-            for (int j = 0; j < 1000; j++) {
-                clientService.createFileMd(parentDir + path, "f-file" + j, getMdAttr("f-file" + j, i, true));
+            for (int j = 0; j < 100; j++) {
+              // clientService.createFileMd(parentDir + path, "f-file" + j, getMdAttr("f-file" + j, i, true));
             }
         }
     }
@@ -120,6 +122,13 @@ public class ClientMultiFind extends BaseMultiMdTest {
                 clientService.listDir(parentDir + path + "/" + "f-dir" + j);
             }
         }
+        /*List<MdAttr> mdAttrs = clientService.listDir(parentDir);
+       // System.out.println(parentDir+" " + mdAttrs.size());
+        for (MdAttr mdAttr : mdAttrs){
+            if (mdAttr.getType()){
+                listDir(parentDir+"/"+mdAttr.getName());
+            }
+        }*/
     }
 
     private void findFile(String parentDir) throws RemoteException {

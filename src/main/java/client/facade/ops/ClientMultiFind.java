@@ -32,7 +32,7 @@ public class ClientMultiFind extends BaseMultiMdTest {
             @Override
             public void run() {
                 try {
-                    buildDirAndFile("/" + Thread.currentThread().getName());
+                    buildDirAndFile("/f" + Thread.currentThread().getName());
                     latchPer.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();

@@ -35,6 +35,14 @@ public class BaseMultiMdTest {
         for (int i = 0; i < threadCount; i++) {
             String threadName = "t" + i;
             name[i] = threadName;
+            clientService.createDirMd("/", threadName, getMdAttr(threadName, 5, true));
+            clientService.createDirMd("/", "f" + threadName, getMdAttr("f" + threadName, 5, true));
+            clientService.createDirMd("/", "r" + threadName, getMdAttr("r" + threadName, 5, true));
+            clientService.createDirMd("/", "d" + threadName, getMdAttr("d" + threadName, 5, true));
+            clientService.createDirMd("/", threadName + "-forFile", getMdAttr(threadName + "-forFile", 99, true));
+            clientService.createDirMd("/", "f" + threadName + "-forFile", getMdAttr("f" + threadName + "-forFile", 99, true));
+            clientService.createDirMd("/", "r" + threadName + "-forFile", getMdAttr("r" + threadName + "-forFile", 99, true));
+            clientService.createDirMd("/", "d" + threadName + "-forFile", getMdAttr("d" + threadName + "-forFile", 99, true));
         }
         threadNameArray = name;
     }

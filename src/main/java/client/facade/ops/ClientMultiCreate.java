@@ -13,6 +13,7 @@ public class ClientMultiCreate extends BaseMultiMdTest {
 
     public ClientMultiCreate() {
         try {
+            super.setUp();
             setUp();
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -20,14 +21,6 @@ public class ClientMultiCreate extends BaseMultiMdTest {
     }
 
     public void setUp() throws RemoteException {
-        String[] name = new String[threadCount];
-        for (int i = 0; i < threadCount; i++) {
-            String threadName = "t" + i;
-            clientService.createDirMd("/", threadName, getMdAttr(threadName, 5, true));
-            clientService.createDirMd("/", threadName + "-forFile", getMdAttr(threadName + "-forFile", 99, true));
-
-            name[i] = threadName;
-        }
         for (int i = 0; i < threadCount; i++) {
             for (int j = 0; j < 100; j++) {
                 String threadName = "t" + i;
@@ -35,7 +28,6 @@ public class ClientMultiCreate extends BaseMultiMdTest {
                         getMdAttr("d"+j, 99, true));
             }
         }
-        threadNameArray = name;
     }
 
     public void testMultiCreate() throws InterruptedException, RemoteException {

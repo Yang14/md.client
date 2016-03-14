@@ -16,6 +16,13 @@ public class ClientMultiRename extends BaseMultiMdTest {
     public ClientMultiRename() {
         try {
             super.setUp();
+            for (int i = 0; i < threadCount; i++) {
+                for (int j = 0; j < 100; j++) {
+                    String dirName = "rd" + j + threadCount;
+                    clientService.createDirMd("/" + threadNameArray[i], dirName,
+                            getMdAttr(dirName, 99, true));
+                }
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -35,7 +42,7 @@ public class ClientMultiRename extends BaseMultiMdTest {
             @Override
             public void run() {
                 try {
-                    renameSubDir("/r" +  Thread.currentThread().getName());
+                    renameSubDir("/" + Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -48,7 +55,7 @@ public class ClientMultiRename extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        int count = 1000 * threadCount;
+        int count = 10000 * threadCount;
         logger.info(String.format("rename dir: %s    %s", count, count * 1000.0 / (end - start)));
     }
 
@@ -58,7 +65,7 @@ public class ClientMultiRename extends BaseMultiMdTest {
             @Override
             public void run() {
                 try {
-                    renameSubFile("/r" + Thread.currentThread().getName() + "-forFile");
+                    renameSubFile("/" + Thread.currentThread().getName() + "-forFile");
                     latchFile.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -71,29 +78,23 @@ public class ClientMultiRename extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        int count = 10000 * threadCount;
+        int count = 100000 * threadCount;
         logger.info(String.format("rename file: %s    %s", count, count * 1000.0 / (end - start)));
     }
 
     private void renameSubDir(String parentDir) throws RemoteException {
-        String path = "";
-        String temp = "";
-        String nName = "";
-        for (int i = 0; i < 10; i++) {
-            temp = "rs" + i + threadCount;
-            nName = "r"+temp;
-            clientService.renameDir(parentDir + path, temp, nName);
-            path += "/" + nName;
+        for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 100; j++) {
-                clientService.renameDir(parentDir + path, "rdir" + j, "r-rdir" + j);
+                clientService.renameDir(parentDir + "/rd" + i + threadCount,
+                        "r-dir" + j, "rr-dir");
             }
         }
     }
 
     private void renameSubFile(String parentDir) throws RemoteException {
         for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 100; j++) {
-                clientService.renameFile(parentDir+"/dr"+ threadCount + "/rd" + i, "file" + j, "r-file" + j);
+            for (int j = 0; j < 1000; j++) {
+                clientService.renameFile(parentDir + "/d" + i + threadCount, "file" + j, "r-file" + j);
             }
         }
     }
@@ -103,7 +104,7 @@ public class ClientMultiRename extends BaseMultiMdTest {
             @Override
             public void run() {
                 try {
-                    createDirAndFileForRename("/r" + Thread.currentThread().getName());
+                    createDirForRename("/" + Thread.currentThread().getName());
                     latchPer.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -115,27 +116,13 @@ public class ClientMultiRename extends BaseMultiMdTest {
         }
         latchPer.await();
         latch.countDown();
-        logger.info(String.format("pre dir for rename"));
     }
 
-    private void createDirAndFileForRename(String parentDir) throws RemoteException {
-        String path = "";
-        String temp = "";
-        for (int i = 0; i < 10; i++) {
-            temp = "rs" + i + threadCount;
-            clientService.createDirMd(parentDir + path, temp, getMdAttr(temp, i, true));
-            path += "/" + temp;
-            for (int j = 0; j < 100; j++) {
-                clientService.createDirMd(parentDir + path, "rdir" + j, getMdAttr("rdir" + j, i, true));
-            }
-        }
-        clientService.createDirMd(parentDir+"-forFile","dr" + threadCount, getMdAttr("rename"+threadCount, 99, true));
+    private void createDirForRename(String parentDir) throws RemoteException {
         for (int i = 0; i < 100; i++) {
-            clientService.createDirMd(parentDir + "-forFile/dr" + threadCount,
-                    "rd" + i, getMdAttr("rd" + i, 99, true));
             for (int j = 0; j < 100; j++) {
-                clientService.createFileMd(parentDir + "-forFile/dr" + threadCount + "/rd" + i,
-                        "file" + j, getMdAttr("file" + j, j, false));
+                clientService.createDirMd(parentDir + "/rd" + i + threadCount,
+                        "r-dir" + j, getMdAttr("r-dir" + j, j, false));
             }
         }
     }

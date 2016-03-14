@@ -1,19 +1,15 @@
 package client.facade.ops;
 
-import base.md.MdAttr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Mr-yang on 16-2-18.
  */
 public class ClientMultiFind extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("TestClient");
-    private CountDownLatch latch = new CountDownLatch(1);
 
     public ClientMultiFind() {
         try {
@@ -24,39 +20,17 @@ public class ClientMultiFind extends BaseMultiMdTest {
     }
 
     public void testMultiFind() throws InterruptedException, RemoteException {
-        operatorForListDir();
         testMultiListDir();
         latchForOps.countDown();
         testMultiFindFile();
     }
 
-    public void operatorForListDir() throws InterruptedException, RemoteException {
-        Runnable run = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    buildDirAndFile("/f" + Thread.currentThread().getName());
-                    latchPer.countDown();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        for (int i = 0; i < threadCount; ++i) {
-            new Thread(run, threadNameArray[i]).start();
-        }
-        latchPer.await();
-        latch.countDown();
-        logger.info(String.format("pre dir for list"));
-    }
-
     public void testMultiListDir() throws InterruptedException, RemoteException {
-        latch.await();
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
-                    listDir("/f" + Thread.currentThread().getName());
+                    listDir("/" + Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -96,34 +70,15 @@ public class ClientMultiFind extends BaseMultiMdTest {
         logger.info(String.format("find file: %s    %s", count, count * 1000.0 / (end - start)));
     }
 
-    private void buildDirAndFile(String parentDir) throws RemoteException {
-        String path = "";
-        String temp = "";
-        for (int i = 0; i < 10; i++) {
-            temp = "fs" + i + threadCount;
-            clientService.createDirMd(parentDir + path, temp, getMdAttr(temp, i, true));
-            path += "/" + temp;
-            for (int j = 0; j < 100; j++) {
-                clientService.createDirMd(parentDir + path, "f-dir" + j, getMdAttr("f-dir" + j, i, true));
-            }
-        }
-    }
-
     private void listDir(String parentDir) throws RemoteException {
-        /*String path = "";
-        String temp = "";
+        String path = "";
+        String temp;
         for (int i = 0; i < 10; i++) {
-            temp = "fs" + i+ threadCount;
+            temp = "s" + i + threadCount;
             clientService.listDir(parentDir + path + "/" + temp);
             path += "/" + temp;
             for (int j = 0; j < 100; j++) {
-                clientService.listDir(parentDir + path + "/" + "f-dir" + j);
-            }
-        }*/
-        List<MdAttr> mdAttrs = clientService.listDir(parentDir);
-        for (MdAttr mdAttr : mdAttrs) {
-            if (mdAttr.getType()) {
-                listDir(parentDir + "/" + mdAttr.getName());
+                clientService.listDir(parentDir + path + "/" + "dir" + j);
             }
         }
     }

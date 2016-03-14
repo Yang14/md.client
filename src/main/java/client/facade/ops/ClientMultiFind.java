@@ -43,8 +43,8 @@ public class ClientMultiFind extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        int count = 1000 * threadCount;
-        logger.info(String.format("find dir: %s    %s    %s", count, count * 1000.0 / (end - start), (end - start)));
+        int count = dirI*dirJ * threadCount;
+        logger.info(String.format("find dir: %s    %s", count, df.format(count * 1000.0 / (end - start))));
     }
 
     public void testMultiFindFile() throws InterruptedException, RemoteException {
@@ -66,26 +66,26 @@ public class ClientMultiFind extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        int count = 100000 * threadCount;
-        logger.info(String.format("find file: %s    %s", count, count * 1000.0 / (end - start)));
+        int count = fileI*fileJ * threadCount;
+        logger.info(String.format("find file: %s    %s", count,  df.format(count * 1000.0 / (end - start))));
     }
 
     private void listDir(String parentDir) throws RemoteException {
         String path = "";
         String temp;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < dirI; i++) {
             temp = "s" + i + threadCount;
-            clientService.listDir(parentDir + path + "/" + temp);
+            //clientService.listDir(parentDir + path + "/" + temp);
             path += "/" + temp;
-            for (int j = 0; j < 100; j++) {
+            for (int j = 0; j < dirJ; j++) {
                 clientService.listDir(parentDir + path + "/" + "dir" + j);
             }
         }
     }
 
     private void findFile(String parentDir) throws RemoteException {
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 1000; j++) {
+        for (int i = 0; i < fileI; i++) {
+            for (int j = 0; j < fileJ; j++) {
                 clientService.findFileMd(parentDir + "/d" + i + threadCount, "file" + j);
             }
         }

@@ -16,6 +16,10 @@ public class SystemPerformance {
     private static Logger logger = LoggerFactory.getLogger("SystemPerformance");
     public static int threadCount;
     public static int count;
+    public static int dirI;
+    public static int dirJ;
+    public static int fileI;
+    public static int fileJ;
 
     public static void testPerformance(int[] countArray) throws RemoteException, InterruptedException {
         for (int i = 0; i < countArray.length; i++) {
@@ -23,11 +27,36 @@ public class SystemPerformance {
             switch (threadCount){
                 case 1:
                 case 2:
-                case 4:count = 10000;break;
-                case 8:count = 100000/8;break;
-                case 16:count = 100000;break;
-                case 32:count = 50000;break;
-                case 64:count = 20000;break;
+                case 4:
+                    dirI = 10;
+                    dirJ = 1000;
+                    fileI = 10;
+                    fileJ = 1000;
+                    break;
+                case 8:
+                    dirI = 10;
+                    dirJ = 1000;
+                    fileI = 80;
+                    fileJ = 1250;
+                    break;
+                case 16:
+                    dirI = 10;
+                    dirJ = 1000;
+                    fileI = 100;
+                    fileJ = 1000;
+                    break;
+                case 32:
+                    dirI = 10;
+                    dirJ = 100;
+                    fileI = 100;
+                    fileJ = 500;
+                    break;
+                case 64:
+                    dirI = 10;
+                    dirJ = 100;
+                    fileI = 100;
+                    fileJ = 200;
+                    break;
 
             }
             testWithThreadCount(threadCount);
@@ -35,12 +64,12 @@ public class SystemPerformance {
     }
 
     private static void testWithThreadCount(int count) throws RemoteException, InterruptedException {
-//        logger.info(String.format("--------------begin test with %s-----------------", count));
+        logger.info(String.format("--------------begin test with %s-----------------", count));
         new ClientMultiCreate().testMultiCreate();
         new ClientMultiFind().testMultiFind();
         new ClientMultiRename().testMultiRename();
         new ClientMultiDel().testMultiDel();
-//        logger.info(String.format("--------------end test -----------------"));
+        logger.info(String.format("--------------end test -----------------"));
     }
 
     public static void main(String[] args) throws RemoteException, InterruptedException {

@@ -49,8 +49,8 @@ public class ClientMultiDel extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        int count = 10000 * threadCount;
-        logger.info(String.format("del dir: %s    %s", count, count * 1000.0 / (end - start)));
+        int count = dirI*dirJ * threadCount;
+        logger.info(String.format("del dir: %s    %s", count,  df.format(count * 1000.0 / (end - start))));
     }
 
     public void testMultiDelFile() throws InterruptedException {
@@ -71,21 +71,21 @@ public class ClientMultiDel extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        int count = 100000 * threadCount;
-        logger.info(String.format("del file: %s    %s", count, count * 1000.0 / (end - start)));
+        int count = fileI*fileJ * threadCount;
+        logger.info(String.format("del file: %s    %s", count, df.format( count * 1000.0 / (end - start))));
     }
 
     private void delDir(String parentDir) throws RemoteException {
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 100; j++) {
-                clientService.deleteDir(parentDir + "/rd" + i + threadCount, "rr-dir");
+        for (int i = 0; i < dirI; i++) {
+            for (int j = 0; j < dirJ; j++) {
+                clientService.deleteDir(parentDir + "/rd" + i + threadCount, "rr-dir"+j);
             }
         }
     }
 
     private void delFile(String parentDir) throws RemoteException {
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 1000; j++) {
+        for (int i = 0; i < fileI; i++) {
+            for (int j = 0; j < fileJ; j++) {
                 clientService.deleteFile(parentDir + "/d" + i + threadCount, "r-file" + j);
             }
         }

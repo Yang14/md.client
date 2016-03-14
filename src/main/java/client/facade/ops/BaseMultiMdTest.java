@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -21,9 +22,14 @@ public class BaseMultiMdTest {
 
     public int threadCount = SystemPerformance.threadCount;
     public int count = SystemPerformance.count;
+    public int dirI = SystemPerformance.dirI;
+    public int dirJ = SystemPerformance.dirJ;
+    public int fileI = SystemPerformance.fileI;
+    public int fileJ = SystemPerformance.fileJ;
     public CountDownLatch latchDir = new CountDownLatch(threadCount);
     public CountDownLatch latchFile = new CountDownLatch(threadCount);
     public CountDownLatch latchPer = new CountDownLatch(threadCount);
+    public DecimalFormat df = new DecimalFormat("0");
 
     public CountDownLatch latchForOps = new CountDownLatch(1);
 

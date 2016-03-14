@@ -55,8 +55,8 @@ public class ClientMultiRename extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        int count = 10000 * threadCount;
-        logger.info(String.format("rename dir: %s    %s", count, count * 1000.0 / (end - start)));
+        int count = dirI*dirJ * threadCount;
+        logger.info(String.format("rename dir: %s    %s", count,  df.format(count * 1000.0 / (end - start))));
     }
 
     public void testMultiRenameFile() throws InterruptedException {
@@ -78,22 +78,22 @@ public class ClientMultiRename extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        int count = 100000 * threadCount;
-        logger.info(String.format("rename file: %s    %s", count, count * 1000.0 / (end - start)));
+        int count = fileI*fileJ * threadCount;
+        logger.info(String.format("rename file: %s    %s", count,  df.format(count * 1000.0 / (end - start))));
     }
 
     private void renameSubDir(String parentDir) throws RemoteException {
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 100; j++) {
+        for (int i = 0; i < dirI; i++) {
+            for (int j = 0; j < dirJ; j++) {
                 clientService.renameDir(parentDir + "/rd" + i + threadCount,
-                        "r-dir" + j, "rr-dir");
+                        "r-dir" + j, "rr-dir" +j);
             }
         }
     }
 
     private void renameSubFile(String parentDir) throws RemoteException {
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 1000; j++) {
+        for (int i = 0; i < fileI; i++) {
+            for (int j = 0; j < fileJ; j++) {
                 clientService.renameFile(parentDir + "/d" + i + threadCount, "file" + j, "r-file" + j);
             }
         }
@@ -119,8 +119,8 @@ public class ClientMultiRename extends BaseMultiMdTest {
     }
 
     private void createDirForRename(String parentDir) throws RemoteException {
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 100; j++) {
+        for (int i = 0; i < dirI; i++) {
+            for (int j = 0; j < dirJ; j++) {
                 clientService.createDirMd(parentDir + "/rd" + i + threadCount,
                         "r-dir" + j, getMdAttr("r-dir" + j, j, false));
             }

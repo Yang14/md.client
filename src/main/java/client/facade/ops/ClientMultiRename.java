@@ -71,7 +71,7 @@ public class ClientMultiRename extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        int count = 100000 * threadCount;
+        int count = 10000 * threadCount;
         logger.info(String.format("rename file: %s    %s", count, count * 1000.0 / (end - start)));
     }
 

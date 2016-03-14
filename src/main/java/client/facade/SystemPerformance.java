@@ -1,6 +1,7 @@
 package client.facade;
 
 import client.facade.ops.ClientMultiFind;
+import client.facade.ops.ClientMultiRename;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +35,8 @@ public class SystemPerformance {
     private static void testWithThreadCount(int count) throws RemoteException, InterruptedException {
 //        logger.info(String.format("--------------begin test with %s-----------------", count));
 //        new ClientMultiCreate().testMultiCreate();
-        new ClientMultiFind().testMultiFind();
-        //new ClientMultiRename().testMultiRename();
+//        new ClientMultiFind().testMultiFind();
+        new ClientMultiRename().testMultiRename();
         //new ClientMultiDel().testMultiDel();
 //        logger.info(String.format("--------------end test -----------------"));
     }

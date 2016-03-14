@@ -54,7 +54,6 @@ public class ClientMultiFind extends BaseMultiMdTest {
             public void run() {
                 try {
                     listDir("/" + Thread.currentThread().getName());
-//                    clientService.listDir("/" + Thread.currentThread().getName() + "-forFile");
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();

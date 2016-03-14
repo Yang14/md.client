@@ -45,7 +45,8 @@ public class ClientMultiRename extends BaseMultiMdTest {
         }
         latchDir.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("rename dir count %s, thread count is %s time: %s", count,threadCount, (end - start)));
+        int count = 1000*threadCount;
+        logger.info(String.format("rename dir: %s    %s",count, count*1000.0/(end - start)));
     }
 
     public void testMultiRenameFile() throws InterruptedException {
@@ -66,18 +67,33 @@ public class ClientMultiRename extends BaseMultiMdTest {
         }
         latchFile.await();
         long end = System.currentTimeMillis();
-        logger.info(String.format("rename file count %s, thread count is %s time: %s",count, threadCount, (end - start)));
+        int count = 100000*threadCount;
+        logger.info(String.format("rename file: %s    %s",count, count*1000.0/(end - start)));
     }
 
     private void renameSubDir(String parentDir) throws RemoteException {
         for (int i = 0; i < count; i++) {
             clientService.renameDir(parentDir, "dir" + i, "r-dir" + i);
         }
+        String path = "";
+        String temp = "";
+        String oldTemp = "";
+        for (int i = 0; i < 10; i++) {
+            temp = "s"+i;
+            oldTemp = "r-s"+i;
+            clientService.renameDir(parentDir+path, temp, oldTemp);
+            path+="/"+oldTemp;
+            for (int j=0;j<100;j++) {
+                clientService.renameDir(parentDir+path, "dir" + j, "r-dir"+j);
+            }
+        }
     }
 
     private void renameSubFile(String parentDir) throws RemoteException {
-        for (int i = 0; i < count; i++) {
-            clientService.renameFile(parentDir, "file" + i, "r-file" + i);
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 1000; j++) {
+                clientService.renameFile(parentDir + "/d" + i, "file" + j, "r-file" + j);
+            }
         }
     }
 

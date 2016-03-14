@@ -93,7 +93,7 @@ public class ClientMultiRename extends BaseMultiMdTest {
     private void renameSubFile(String parentDir) throws RemoteException {
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 100; j++) {
-                clientService.renameFile(parentDir+ threadCount + "/rd" + i, "file" + j, "r-file" + j);
+                clientService.renameFile(parentDir+"/dr"+ threadCount + "/rd" + i, "file" + j, "r-file" + j);
             }
         }
     }
@@ -129,12 +129,12 @@ public class ClientMultiRename extends BaseMultiMdTest {
                 clientService.createDirMd(parentDir + path, "rdir" + j, getMdAttr("rdir" + j, i, true));
             }
         }
-
+        clientService.createDirMd(parentDir+"-forFile","dr" + threadCount, getMdAttr("rename"+threadCount, 99, true));
         for (int i = 0; i < 100; i++) {
-            clientService.createDirMd(parentDir + "-forFile" + threadCount,
+            clientService.createDirMd(parentDir + "-forFile/dr" + threadCount,
                     "rd" + i, getMdAttr("rd" + i, 99, true));
             for (int j = 0; j < 100; j++) {
-                clientService.createFileMd(parentDir + "-forFile" + threadCount + "/rd" + i,
+                clientService.createFileMd(parentDir + "-forFile/dr" + threadCount + "/rd" + i,
                         "file" + j, getMdAttr("file" + j, j, false));
             }
         }

@@ -26,8 +26,8 @@ public class ClientMultiFind extends BaseMultiMdTest {
     public void testMultiFind() throws InterruptedException, RemoteException {
         operatorForListDir();
         testMultiListDir();
-//        latchForOps.countDown();
-//        testMultiFindFile();
+        latchForOps.countDown();
+        testMultiFindFile();
     }
 
     public void operatorForListDir() throws InterruptedException, RemoteException {

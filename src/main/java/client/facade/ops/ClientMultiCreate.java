@@ -24,8 +24,8 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         for (int i = 0; i < threadCount; i++) {
             for (int j = 0; j < 100; j++) {
                 String threadName = "t" + i;
-                clientService.createDirMd("/"+ threadName + "-forFile","d"+j,
-                        getMdAttr("d"+j, 99, true));
+                clientService.createDirMd("/"+ threadName + "-forFile","d"+j+threadCount,
+                        getMdAttr("d"+j+threadCount, 99, true));
             }
         }
     }
@@ -85,7 +85,7 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         String path = "";
         String temp = "";
         for (int i = 0; i < 10; i++) {
-            temp = "s"+i;
+            temp = "s"+i+ threadCount;
             clientService.createDirMd(parentDir+path, temp, getMdAttr(temp,i, true));
             path+="/"+temp;
             for (int j=0;j<100;j++) {
@@ -97,7 +97,7 @@ public class ClientMultiCreate extends BaseMultiMdTest {
     private void buildSubFile(String parentDir) throws RemoteException {
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 1000; j++) {
-                clientService.createFileMd(parentDir +"/d"+ i, "file" + j, getMdAttr("file" + j, j, false));
+                clientService.createFileMd(parentDir +"/d"+ i+threadCount, "file" + j, getMdAttr("file" + j, j, false));
             }
         }
     }

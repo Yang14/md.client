@@ -35,12 +35,12 @@ public class SystemPerformance {
     }
 
     private static void testWithThreadCount(int count) throws RemoteException, InterruptedException {
-        logger.info(String.format("--------------begin test with %s-----------------", count));
-      //  new ClientMultiCreate().testMultiCreate();
-        new ClientMultiFind().testMultiFind();
+//        logger.info(String.format("--------------begin test with %s-----------------", count));
+        new ClientMultiCreate().testMultiCreate();
+//        new ClientMultiFind().testMultiFind();
         //new ClientMultiRename().testMultiRename();
         //new ClientMultiDel().testMultiDel();
-        logger.info(String.format("--------------end test -----------------"));
+//        logger.info(String.format("--------------end test -----------------"));
     }
 
     public static void main(String[] args) throws RemoteException, InterruptedException {

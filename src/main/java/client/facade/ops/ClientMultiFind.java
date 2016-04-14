@@ -1,15 +1,19 @@
 package client.facade.ops;
 
+import base.md.MdAttr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Mr-yang on 16-2-18.
  */
 public class ClientMultiFind extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("TestClient");
+    private final CountDownLatch gate = new CountDownLatch(1);
 
     public ClientMultiFind() {
         try {
@@ -21,8 +25,8 @@ public class ClientMultiFind extends BaseMultiMdTest {
 
     public void testMultiFind() throws InterruptedException, RemoteException {
         testMultiListDir();
-        latchForOps.countDown();
-        testMultiFindFile();
+//        latchForOps.countDown();
+//        testMultiFindFile();
     }
 
     public void testMultiListDir() throws InterruptedException, RemoteException {
@@ -30,9 +34,15 @@ public class ClientMultiFind extends BaseMultiMdTest {
             @Override
             public void run() {
                 try {
-                    listDir("/" + Thread.currentThread().getName());
+//                    listDir("/" + Thread.currentThread().getName());
+//                    clientService.listDir("/" + Thread.currentThread().getName());
+                    gate.await();
+
+                    forTravelAllDir("/" + Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -41,21 +51,33 @@ public class ClientMultiFind extends BaseMultiMdTest {
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
+        gate.countDown();
         latchDir.await();
         long end = System.currentTimeMillis();
         int count = dirI*dirJ * threadCount;
-        logger.info(String.format("find dir: %s    %s", count, df.format(count * 1000.0 / (end - start))));
+        logger.info(String.format("find dir: %s    %s", count, df.format((end - start))));
+    }
+
+    private void forTravelAllDir(String parentDir) throws RemoteException {
+        List<MdAttr> mdAttrs = clientService.listDir(parentDir);
+        for (MdAttr mdAttr : mdAttrs){
+            if (mdAttr.getType()){
+                forTravelAllDir(parentDir+"/"+mdAttr.getName());
+            }
+        }
     }
 
     public void testMultiFindFile() throws InterruptedException, RemoteException {
-        latchForOps.await();
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
+                    latchForOps.await();
                     findFile("/" + Thread.currentThread().getName() + "-forFile");
                     latchFile.countDown();
                 } catch (RemoteException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }

@@ -4,12 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Mr-yang on 16-2-18.
  */
 public class ClientMultiDel extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("ClientMultiDel");
+    private CountDownLatch gate = new CountDownLatch(1);
 
     public ClientMultiDel() {
         try {
@@ -24,7 +26,7 @@ public class ClientMultiDel extends BaseMultiMdTest {
     }
 
     public void testMultiDel() throws InterruptedException {
-        testMultiDelFile();
+//        testMultiDelFile();
         latchForOps.countDown();
         testMultiDelDir();
     }
@@ -35,22 +37,28 @@ public class ClientMultiDel extends BaseMultiMdTest {
             @Override
             public void run() {
                 try {
-//                    clientService.deleteDir("/", Thread.currentThread().getName());
-                    delDir("/"+ Thread.currentThread().getName());
+                    gate.await();
+                    clientService.deleteDir("/", Thread.currentThread().getName());
+//                    delDir("/"+ Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         };
-        long start = System.currentTimeMillis();
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
+        long start = System.currentTimeMillis();
+        gate.countDown();
         latchDir.await();
         long end = System.currentTimeMillis();
-        int count = dirI*dirJ * threadCount;
-        logger.info(String.format("del dir: %s    %s", count,  df.format(count * 1000.0 / (end - start))));
+        int lcount = count * threadCount;
+        logger.info(String.format("del dir: %s    %s    %s",
+                lcount,  df.format(lcount * 1000.0 / (end - start)),(end -start)));
+        gate = new CountDownLatch(1);
     }
 
     public void testMultiDelFile() throws InterruptedException {

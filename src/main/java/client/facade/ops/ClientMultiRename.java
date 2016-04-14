@@ -12,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 public class ClientMultiRename extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("ClientMultiRename");
     private CountDownLatch latch = new CountDownLatch(1);
+    private CountDownLatch gate = new CountDownLatch(1);
 
     public ClientMultiRename() {
         try {
@@ -30,64 +31,75 @@ public class ClientMultiRename extends BaseMultiMdTest {
 
 
     public void testMultiRename() throws InterruptedException, RemoteException {
-        operatorForRename();
+        //operatorForRename();
         testMultiRenameFile();
-        latchForOps.countDown();
-        testMultiRenameDir();
+        //latchForOps.countDown();
+//       testMultiRenameDir();
     }
 
     public void testMultiRenameDir() throws InterruptedException {
-        latchForOps.await();
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
+                    gate.await();
                     renameSubDir("/" + Thread.currentThread().getName());
                     latchDir.countDown();
                 } catch (RemoteException e) {
                     e.printStackTrace();
-                }
-            }
-        };
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < threadCount; ++i) {
-            new Thread(run, threadNameArray[i]).start();
-        }
-        latchDir.await();
-        long end = System.currentTimeMillis();
-        int count = dirI*dirJ * threadCount;
-        logger.info(String.format("rename dir: %s    %s", count,  df.format(count * 1000.0 / (end - start))));
-    }
-
-    public void testMultiRenameFile() throws InterruptedException {
-        latch.await();
-        Runnable run = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    renameSubFile("/" + Thread.currentThread().getName() + "-forFile");
-                    latchFile.countDown();
-                } catch (RemoteException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         };
-        long start = System.currentTimeMillis();
         for (int i = 0; i < threadCount; ++i) {
             new Thread(run, threadNameArray[i]).start();
         }
+        long start = System.currentTimeMillis();
+        gate.countDown();
+        latchDir.await();
+        long end = System.currentTimeMillis();
+        int lcount = count* threadCount;
+        logger.info(String.format("rename dir: %s    %s", lcount,  df.format(lcount * 1000.0 / (end - start))));
+    }
+
+    public void testMultiRenameFile() throws InterruptedException {
+        //latch.await();
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    gate.await();
+                    renameSubFile("/" + Thread.currentThread().getName() + "-forFile");
+                    latchFile.countDown();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        for (int i = 0; i < threadCount; ++i) {
+            new Thread(run, threadNameArray[i]).start();
+        }
+        long start = System.currentTimeMillis();
+        gate.countDown();
         latchFile.await();
         long end = System.currentTimeMillis();
         int count = fileI*fileJ * threadCount;
         logger.info(String.format("rename file: %s    %s", count,  df.format(count * 1000.0 / (end - start))));
+        gate = new CountDownLatch(1);
     }
 
     private void renameSubDir(String parentDir) throws RemoteException {
-        for (int i = 0; i < dirI; i++) {
+        /*for (int i = 0; i < dirI; i++) {
             for (int j = 0; j < dirJ; j++) {
                 clientService.renameDir(parentDir + "/rd" + i + threadCount,
                         "r-dir" + j, "rr-dir" +j);
             }
+        }*/
+        for (int i = 0; i < count; i++) {
+            clientService.renameDir(parentDir, "dir" + i,"r-dir" + i);
         }
     }
 
@@ -96,7 +108,10 @@ public class ClientMultiRename extends BaseMultiMdTest {
             for (int j = 0; j < fileJ; j++) {
                 clientService.renameFile(parentDir + "/d" + i + threadCount, "file" + j, "r-file" + j);
             }
+
         }
+
+
     }
 
     public void operatorForRename() throws RemoteException, InterruptedException {

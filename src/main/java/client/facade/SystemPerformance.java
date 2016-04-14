@@ -15,7 +15,7 @@ import java.rmi.RemoteException;
 public class SystemPerformance {
     private static Logger logger = LoggerFactory.getLogger("SystemPerformance");
     public static int threadCount;
-    public static int count;
+    public static int count=500;
     public static int dirI;
     public static int dirJ;
     public static int fileI;
@@ -28,34 +28,40 @@ public class SystemPerformance {
                 case 1:
                 case 2:
                 case 4:
-                    dirI = 10;
-                    dirJ = 1000;
+                    dirI = 1;
+                    dirJ = 10000;
                     fileI = 10;
                     fileJ = 1000;
                     break;
                 case 8:
-                    dirI = 10;
-                    dirJ = 1000;
-                    fileI = 80;
-                    fileJ = 1250;
+                    dirI = 1;
+                    dirJ = 10000;
+                    fileI = 10;
+                    fileJ = 1000;
                     break;
                 case 16:
-                    dirI = 10;
+                    dirI = 1;
                     dirJ = 1000;
-                    fileI = 100;
+                    fileI = 10;
                     fileJ = 1000;
                     break;
                 case 32:
-                    dirI = 10;
-                    dirJ = 100;
-                    fileI = 100;
-                    fileJ = 500;
+                    dirI = 1;
+                    dirJ = 1000;
+                    fileI = 10;
+                    fileJ = 1000;
                     break;
                 case 64:
-                    dirI = 10;
-                    dirJ = 100;
-                    fileI = 100;
-                    fileJ = 200;
+                    dirI = 1;
+                    dirJ = 1000;
+                    fileI = 10;
+                    fileJ = 1000;
+                    break;
+                case 128:
+                    dirI = 1;
+                    dirJ = 1000;
+                    fileI = 10;
+                    fileJ = 1000;
                     break;
 
             }
@@ -66,9 +72,9 @@ public class SystemPerformance {
     private static void testWithThreadCount(int count) throws RemoteException, InterruptedException {
         logger.info(String.format("--------------begin test with %s-----------------", count));
         new ClientMultiCreate().testMultiCreate();
-        new ClientMultiFind().testMultiFind();
+//        new ClientMultiFind().testMultiFind();
         new ClientMultiRename().testMultiRename();
-        new ClientMultiDel().testMultiDel();
+//       new ClientMultiDel().testMultiDel();
         logger.info(String.format("--------------end test -----------------"));
     }
 

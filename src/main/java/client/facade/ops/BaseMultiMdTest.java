@@ -39,7 +39,7 @@ public class BaseMultiMdTest {
     public void setUp() throws RemoteException {
         String[] name = new String[threadCount];
         for (int i = 0; i < threadCount; i++) {
-            String threadName = "t" + i;
+            String threadName = "t" + i + threadCount;
             name[i] = threadName;
             clientService.createDirMd("/", threadName, getMdAttr(threadName, 5, true));
             clientService.createDirMd("/", "f" + threadName, getMdAttr("f" + threadName, 5, true));

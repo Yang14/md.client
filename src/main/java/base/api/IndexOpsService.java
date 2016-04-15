@@ -30,6 +30,8 @@ public interface IndexOpsService extends Remote {
      */
     public List<MdPos> getMdPosList(String path) throws RemoteException;
 
+    public MdPos getMdPosListForCreateFile(String path) throws RemoteException;
+
     /**
      * 重命名目录索引
      */

@@ -12,7 +12,7 @@ public class JedisPoolUtils {
     private static String ADDR = "192.168.0.13";
 
     //Redis的端口号
-    private static int PORT = 22121;
+    private static int PORT = 6379;
 
     //访问密码
     private static String AUTH = "";

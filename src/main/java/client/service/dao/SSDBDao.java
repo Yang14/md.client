@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface SSDBDao {
 
-    public boolean insertMd(MdPos mdPos, String name, MdAttr mdAttr);
+    public boolean insertMd(String parentDirPath, MdPos mdPos, String name, MdAttr mdAttr);
 
     public MdAttr findFileMd(MdPos mdPos, String name);
 

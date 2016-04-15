@@ -31,20 +31,18 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public boolean createFileMd(String parentDirPath, String fileName, MdAttr mdAttr) throws RemoteException {
-        MdPos mdPos;
-        List<MdPos> mdPosList = getMdPosListByPath(parentDirPath);
-        mdPos = mdPosList.get(mdPosList.size()-1);
-        return ssdbService.insertMd(mdPos, fileName, mdAttr);
+        MdPos mdPos = getMdPosListByPathForCreateFile(parentDirPath);
+        return ssdbService.insertMd(parentDirPath, mdPos, fileName, mdAttr);
     }
 
     @Override
     public boolean createDirMd(String parentDirPath, String dirName, MdAttr mdAttr) throws RemoteException {
         MdPos mdPos = indexOpsHolder.get().createDirIndex(parentDirPath, dirName);
         if (mdPos == null) {
-            //logger.error("create dir error: parentDirPath:" + parentDirPath + ",dirName:" + dirName);
+            logger.error("create dir error: parentDirPath:" + parentDirPath + ",dirName:" + dirName);
             return false;
         }
-        return ssdbService.insertMd(mdPos, dirName, mdAttr);
+        return ssdbService.insertMd(parentDirPath,mdPos, dirName, mdAttr);
     }
 
     @Override
@@ -120,7 +118,18 @@ public class ClientServiceImpl implements ClientService {
         }
         return renameResult;
     }
-
+    private MdPos getMdPosListByPathForCreateFile(String path) throws RemoteException {
+        MdPos mdPos = MdPosCacheTool.getMdPosListFromCacheForCreateFile(path);
+        if (mdPos == null) {
+            mdPos = indexOpsHolder.get().getMdPosListForCreateFile(path);
+            if (mdPos == null) {
+                logger.error("getMdPosListByPathForCreateFile for " + path + " error. MdPos == null");
+                return null;
+            }
+            MdPosCacheTool.setMdPosListToCacheForCreateFile(path, mdPos);
+        }
+        return mdPos;
+    }
     private List<MdPos> getMdPosListByPath(String path) throws RemoteException {
         List<MdPos> mdPosList = MdPosCacheTool.getMdPosListFromCache(path);
         if (mdPosList == null) {

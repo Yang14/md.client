@@ -16,9 +16,27 @@ public class TestFunction extends BaseMultiMdTest {
     static Logger logger = LoggerFactory.getLogger("TestFunction");
     ClientService clientService = new ClientServiceImpl();
 
-    String dirName = "f-dir";
-    String fileName = "f-file";
-    int count = 5;
+    String dirName = "f2-dir";
+    String fileName = "f1-file";
+    int count = 20;
+
+
+    @Test
+    public void testBucketSize() throws RemoteException {
+        clientService.createDirMd("/", dirName, getMdAttr(dirName, 0, true));
+        for (int i = 0; i < count; i++) {
+            clientService.createFileMd("/" + dirName, fileName + i, getMdAttr(fileName + i, i, false));
+        }
+       /* for (int i = 0; i < count; i++) {
+            clientService.createDirMd("/", dirName + i, getMdAttr(dirName + i, i, true));
+        }*/
+    }
+
+    @Test
+    public void testList() throws RemoteException {
+        printMdList(clientService.listDir("/"+dirName));
+
+    }
 
     @Test
     public void testClearPart() throws RemoteException {
@@ -35,7 +53,7 @@ public class TestFunction extends BaseMultiMdTest {
         long start = System.currentTimeMillis();
 //        clientService.deleteDir("/d1","d2");
         long end = System.currentTimeMillis();
-        logger.info(String.format("clear dir /,,use time: %s",(end - start)));
+        logger.info(String.format("clear dir /,,use time: %s", (end - start)));
     }
 
     @Test
@@ -43,11 +61,12 @@ public class TestFunction extends BaseMultiMdTest {
         testClearPart();
         logger.info("begin to clean /.");
         long start = System.currentTimeMillis();
-        clientService.deleteDir("/","");
+        clientService.deleteDir("/", "");
         long end = System.currentTimeMillis();
-        logger.info(String.format("clear dir /,,use time: %s",(end - start)));
+        logger.info(String.format("clear dir /,,use time: %s", (end - start)));
 
     }
+
     @Test
     public void testCreateDir() throws RemoteException {
         logger.info("begin test");

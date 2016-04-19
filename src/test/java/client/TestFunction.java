@@ -16,10 +16,61 @@ public class TestFunction extends BaseMultiMdTest {
     static Logger logger = LoggerFactory.getLogger("TestFunction");
     ClientService clientService = new ClientServiceImpl();
 
-    String dirName = "f2-dir";
+    String dirName = "f3-dir";
     String fileName = "f1-file";
     int count = 20;
 
+    @Test
+    public void testBalanceFactor() {
+        int[] bucketSizeArray = {100, 200, 300, 500, 700, 1000, 10000};
+        for (int bucketSize : bucketSizeArray) {
+            calFDB(bucketSize);
+        }
+    }
+
+    @Test
+    public void renameDir() throws RemoteException {
+        clientService.createDirMd("/", dirName, getMdAttr(dirName, 0, true));
+        long start = System.currentTimeMillis();
+        clientService.renameDir("/", dirName, dirName + "new");
+        long end = System.currentTimeMillis();
+        logger.info("" + (end - start));
+    }
+
+    private void calFDB(int bucketSize) {
+        int dirCount = 1000;
+        int dirSize = 1000;
+        int mdsNum = 17;
+
+        int[] mdCount = new int[mdsNum];
+        for (int i = 0, j = 0, k = 0; i < dirCount * dirSize; i++) {
+            mdCount[j] = mdCount[j] + 1;
+            if (++k >= bucketSize) {
+                if (++j > mdsNum - 1) {
+                    j = 0;
+                }
+                k = 0;
+            }
+        }/*
+        double fdb = 0;
+        for (int i = 0; i < mdsNum; i++) {
+            fdb += Math.pow((mdCount[i] / (dirCount * dirSize * 1.0)) - 1, 2);
+//            logger.info(mdCount[i]+"");
+        }
+        fdb *= 1.0 / (mdsNum - 1);
+        fdb = Math.sqrt(fdb);
+        logger.info(bucketSize + "\t\t" + fdb);
+        */
+        double dx = 0;
+        double mean = dirCount * dirSize / (mdsNum * 1.0);
+        for (int i = 0; i < mdsNum; i++) {
+            dx += Math.pow(1.0 * (mdCount[i] - mean), 2);
+//            logger.info(mdCount[i]+" " + dx);
+        }
+        dx = dx / mdsNum * 1.0;
+        dx = Math.sqrt(dx);
+        logger.info(bucketSize + "\t\t" + dx + " " + mean);
+    }
 
     @Test
     public void testBucketSize() throws RemoteException {
@@ -27,6 +78,7 @@ public class TestFunction extends BaseMultiMdTest {
         for (int i = 0; i < count; i++) {
             clientService.createFileMd("/" + dirName, fileName + i, getMdAttr(fileName + i, i, false));
         }
+        printMdList(clientService.listDir("/" + dirName));
        /* for (int i = 0; i < count; i++) {
             clientService.createDirMd("/", dirName + i, getMdAttr(dirName + i, i, true));
         }*/
@@ -34,7 +86,7 @@ public class TestFunction extends BaseMultiMdTest {
 
     @Test
     public void testList() throws RemoteException {
-        printMdList(clientService.listDir("/"+dirName));
+        printMdList(clientService.listDir("/" + dirName));
 
     }
 

@@ -12,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 public class ClientMultiCreate extends BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("ClientMultiCreate");
     private CountDownLatch gate = new CountDownLatch(1);
+
     public ClientMultiCreate() {
         try {
             super.setUp();
@@ -24,16 +25,16 @@ public class ClientMultiCreate extends BaseMultiMdTest {
     public void setUp() throws RemoteException {
         String[] names = new String[threadCount];
         for (int i = 0; i < threadCount; i++) {
-                String threadName = "t" +i + threadCount;
-                names[i] = threadName;
+            String threadName = "t" + i + threadCount;
+            names[i] = threadName;
             clientService.createDirMd("/", threadName, getMdAttr(threadName, 5, true));
             clientService.createDirMd("/", threadName + "-forFile", getMdAttr(threadName + "-forFile", 99, true));
         }
-        for(int i=0;i<threadCount;i++){
-            for(int j=0;j<fileI;j++){
+        for (int i = 0; i < threadCount; i++) {
+            for (int j = 0; j < fileI; j++) {
                 String dirName = "d" + j + threadCount;
                 String name = "t" + i + threadCount;
-                clientService.createDirMd("/" + name + "-forFile",dirName, getMdAttr(dirName, 100, true));
+                clientService.createDirMd("/" + name + "-forFile", dirName, getMdAttr(dirName, 100, true));
             }
         }
     }
@@ -43,9 +44,9 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         for(int deep :deeps) {
             testMultiCreateDir(deep);
         }*/
-//        testMultiCreateDir();
-        latchForOps.countDown();
-        testMultiCreateFile();
+        testMultiCreateDir();
+//        latchForOps.countDown();
+//        testMultiCreateFile();
     }
 
     public void testMultiCreateDir() throws InterruptedException, RemoteException {
@@ -73,7 +74,8 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         long end = System.currentTimeMillis();
 //        int count = dirI*dirJ * threadCount;
         int localCount = count * threadCount;
-        logger.info(String.format("create dir: %s    %s", localCount,  df.format(localCount*1000.0/(end - start))));
+        logger.info(String.format("create dir: %s    %s %s",
+                localCount, df.format(localCount * 1000.0 / (end - start)), (end - start)));
         latchDir = new CountDownLatch(threadCount);
         gate = new CountDownLatch(1);
 
@@ -102,28 +104,16 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         gate.countDown();
         latchFile.await();
         long end = System.currentTimeMillis();
-        int count = fileI*fileJ * threadCount;
+        int count = fileI * fileJ * threadCount;
         logger.info(String.format("create file: %s    %s", count, df.format(count * 1000.0 / (end - start))));
         gate = new CountDownLatch(1);
     }
 
     private void buildSubDir(String parentDir) throws RemoteException {
-        /*String path = "";
-        String temp;
-        for (int i = 0; i < dirI; i++) {
-            temp = "s" + i + threadCount;
-            clientService.createDirMd(parentDir + path, temp, getMdAttr(temp, i, true));
-            path += "/" + temp;
-            for (int j = 0; j < dirJ; j++) {
-                clientService.createDirMd(parentDir + path, "dir" + j, getMdAttr("dir" + j, i, true));
-            }
-        }*/
-       /* for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++) {
             clientService.createDirMd(parentDir, "dir" + i, getMdAttr("dir" + i, i, true));
-//            clientService.createFileMd(parentDir,"file" + i, getMdAttr("file" + i, i, false));
-
-        }*/
-        forTravelAndDelAllDir(parentDir);
+        }
+//        forTravelAndDelAllDir(parentDir);
 //        forRenameDir(parentDir);
     }
 
@@ -132,6 +122,7 @@ public class ClientMultiCreate extends BaseMultiMdTest {
             clientService.createDirMd(parentDir, "dir" + i, getMdAttr("dir" + i, i, true));
         }
     }
+
     private void forTravelAndDelAllDir(String parentDir) throws RemoteException {
         String path = "";
         String temp;
@@ -148,11 +139,11 @@ public class ClientMultiCreate extends BaseMultiMdTest {
         }
     }
 
-    private void forDeep(String parentDir,int deep) throws RemoteException {
+    private void forDeep(String parentDir, int deep) throws RemoteException {
         String path = "";
         String temp;
         for (int i = 0; i < deep; i++) {
-            temp = "s" + i + threadCount+deep;
+            temp = "s" + i + threadCount + deep;
             clientService.createDirMd(parentDir + path, temp, getMdAttr(temp, i, true));
             path += "/" + temp;
             for (int j = 0; j < 10; j++) {

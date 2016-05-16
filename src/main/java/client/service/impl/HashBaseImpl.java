@@ -21,19 +21,18 @@ import java.util.Map;
  */
 public class HashBaseImpl implements ClientService {
     private static Logger logger = LoggerFactory.getLogger("HashBaseImpl");
-    private static String[] IPList = new String[]{/*"192.168.0.60", "192.168.0.58",*/ "192.168.0.61"};
+    private static String[] IPList = new String[]{"192.168.0.58", "192.168.0.60", "192.168.0.61"};
     private static final int SEED = 0xB0F57EE3;
 
     @Override
     public boolean createFileMd(String parentDirPath, String fileName, MdAttr mdAttr) throws RemoteException {
         SSDB ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(parentDirPath)));
-        return ssdb.hset(parentDirPath, fileName, JSON.toJSONString(mdAttr)).ok();
+        return ssdb.hset(calHashCode(parentDirPath), fileName, JSON.toJSONString(mdAttr)).ok();
     }
 
     @Override
     public boolean createDirMd(String parentDirPath, String dirName, MdAttr mdAttr) throws RemoteException {
-        SSDB ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(parentDirPath + ":" + dirName)));
-        return ssdb.hset(parentDirPath, dirName, JSON.toJSONString(mdAttr)).ok();
+        return createFileMd(parentDirPath, dirName, mdAttr);
     }
 
     @Override
@@ -44,11 +43,9 @@ public class HashBaseImpl implements ClientService {
 
     @Override
     public List<MdAttr> listDir(String dirPath) throws RemoteException {
-        int lastSeparatorIdx = dirPath.lastIndexOf("/");
-        String dirName = dirPath.substring(lastSeparatorIdx);
-        dirName = dirName.equals("") ? "/" : dirName;
+
         SSDB ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(dirPath)));
-        Map<String, String> mdAttrMap = ssdb.hgetall(dirName).mapString();
+        Map<String, String> mdAttrMap = ssdb.hgetall(calHashCode(dirPath)).mapString();
         List<MdAttr> mdAttrs = new ArrayList<MdAttr>();
         for (String value : mdAttrMap.values()) {
             mdAttrs.add(JSON.parseObject(value, MdAttr.class));
@@ -56,14 +53,29 @@ public class HashBaseImpl implements ClientService {
         return mdAttrs;
     }
 
+    /**
+     * 1.重命名dir父目录中名称
+     * 2.迁移dir完整路径对应桶中数据
+     */
     @Override
     public boolean renameDir(String parentDirPath, String oldName, String newName) throws RemoteException {
-        SSDB ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(parentDirPath + ":" + oldName)));
-        Map<String, String> fileMap = ssdb.hgetall(oldName).mapString();
+        SSDB ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(parentDirPath)));
+        MdAttr mdAttr = JSON.parseObject(ssdb.hget(calHashCode(parentDirPath), oldName).asString(), MdAttr.class);
+        mdAttr.setName(newName);
+        ssdb.hset(calHashCode(parentDirPath), newName, JSON.toJSONString(mdAttr));
+        ssdb.hdel(calHashCode(parentDirPath), oldName);
+
+        String fullDirPath = parentDirPath.equals("/") ?
+                parentDirPath + oldName : parentDirPath + "/" + oldName;
+        ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(fullDirPath)));
+        Map<String, String> fileMap = ssdb.hgetall(calHashCode(fullDirPath)).mapString();
         ssdb.hclear(oldName);
-        ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(parentDirPath + ":" + newName)));
+
+        fullDirPath = parentDirPath.equals("/") ?
+                parentDirPath + newName : parentDirPath + "/" + newName;
+        ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(fullDirPath)));
         for (String key : fileMap.keySet()) {
-            ssdb.hset(newName, key, fileMap.get(key));
+            ssdb.hset(calHashCode(fullDirPath), key, fileMap.get(key));
         }
         return true;
     }
@@ -76,13 +88,16 @@ public class HashBaseImpl implements ClientService {
 
     @Override
     public boolean deleteDir(String parentPath, String dirName) throws RemoteException {
-        SSDB ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(parentPath + ":" + dirName)));
-        Map<String, String> fileMap = ssdb.hgetall(dirName).mapString();
-        ssdb.hclear(dirName);
-        for (String key : fileMap.keySet()) {
-            MdAttr mdAttr = JSON.parseObject(key, MdAttr.class);
+        String fullDirPath = parentPath.equals("/") ?
+                parentPath + dirName : parentPath + "/" + dirName;
+        SSDB ssdb = ConnTool.getSSDB(genMdPos(getIpByPath(fullDirPath)));
+        Map<String, String> fileMap = ssdb.hgetall(calHashCode(fullDirPath)).mapString();
+        ssdb.hclear(calHashCode(fullDirPath));
+
+        for (String value : fileMap.values()) {
+            MdAttr mdAttr = JSON.parseObject(value, MdAttr.class);
             if (mdAttr.getType()) {
-                deleteDir(parentPath + "/dirName", mdAttr.getName());
+                deleteDir(fullDirPath, mdAttr.getName());
             }
         }
         return true;
@@ -101,5 +116,10 @@ public class HashBaseImpl implements ClientService {
     private String getIpByPath(String path) {
         byte[] bytes = path.getBytes();
         return IPList[((int) (Murmur2.hash(bytes, bytes.length, SEED) % IPList.length))];
+    }
+
+    private String calHashCode(String key) {
+        byte[] bytes = key.getBytes();
+        return String.valueOf(Murmur2.hash(bytes, bytes.length, SEED));
     }
 }

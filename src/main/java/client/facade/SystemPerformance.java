@@ -26,13 +26,13 @@ public class SystemPerformance {
                 case 2:
                 case 4:
                     dirI = 1;
-                    dirJ = 10000;
+                    dirJ = 1000;
                     fileI = 10;
                     fileJ = 1000;
                     break;
                 case 8:
                     dirI = 1;
-                    dirJ = 10000;
+                    dirJ = 1000;
                     fileI = 10;
                     fileJ = 1000;
                     break;

@@ -32,9 +32,9 @@ public class ClientMultiRename extends BaseMultiMdTest {
 
     public void testMultiRename() throws InterruptedException, RemoteException {
         //operatorForRename();
-        testMultiRenameFile();
-        //latchForOps.countDown();
-//       testMultiRenameDir();
+//        testMultiRenameFile();
+        latchForOps.countDown();
+       testMultiRenameDir();
     }
 
     public void testMultiRenameDir() throws InterruptedException {

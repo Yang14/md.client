@@ -3,7 +3,7 @@ package client.facade.ops;
 import base.md.MdAttr;
 import client.facade.SystemPerformance;
 import client.service.ClientService;
-import client.service.impl.ClientServiceImpl;
+import client.service.impl.HashBaseImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.CountDownLatch;
 public class BaseMultiMdTest {
     private static Logger logger = LoggerFactory.getLogger("BaseMultiMdTest");
 
-    public ClientService clientService = new ClientServiceImpl();
+    public ClientService clientService = new HashBaseImpl();
 
     public int threadCount = SystemPerformance.threadCount;
     public int count = SystemPerformance.count;

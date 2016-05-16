@@ -3,11 +3,16 @@ package client;
 import client.perform.BaseMultiMdTest;
 import client.service.ClientService;
 import client.service.impl.ClientServiceImpl;
+import com.sangupta.murmur.Murmur2;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Mr-yang on 16-2-25.
@@ -19,13 +24,29 @@ public class TestFunction extends BaseMultiMdTest {
     String dirName = "f3-dir";
     String fileName = "f1-file";
     int count = 20;
+    private static final int MAX_ELEMENTS = 1000 * 1000;
+    private static final List<String> UUIDs = new ArrayList<String>();
+
+    private static final int SEED = 0xB0F57EE3;
+
+    @BeforeClass
+    public static void onlyOnce() {
+        for(int index = 0; index < MAX_ELEMENTS; index++) {
+            UUIDs.add(UUID.randomUUID().toString());
+        }
+    }
 
     @Test
-    public void testBalanceFactor() {
-        int[] bucketSizeArray = {100, 200, 300, 500, 700, 1000, 10000};
-        for (int bucketSize : bucketSizeArray) {
-            calFDB(bucketSize);
+    public void testMurmur2() {
+        long start = System.currentTimeMillis();
+
+        for(String uuid : UUIDs) {
+            byte[] bytes = uuid.getBytes();
+            Murmur2.hash(bytes, bytes.length, SEED);
         }
+
+        long end = System.currentTimeMillis();
+        System.out.println("Time taken to compute Murmur2 hash: " + (end - start) + "ms.");
     }
 
     @Test
@@ -37,11 +58,19 @@ public class TestFunction extends BaseMultiMdTest {
         logger.info("" + (end - start));
     }
 
-    private void calFDB(int bucketSize) {
-        int dirCount = 1000;
-        int dirSize = 1000;
-        int mdsNum = 17;
+    @Test
+    public void testBalanceFactor() {
+        int[] dirCountArray = {10, 200, 500, 1000};
+        int dirSize = 10000;
+        int bucketSize = 3000;
+        for (int i = 0; i < dirCountArray.length; ++i) {
+            calFDB(dirCountArray[i], dirSize, bucketSize);
+        }
+    }
 
+
+    private void calFDB(int dirCount, int dirSize, int bucketSize) {
+        int mdsNum = 3;
         int[] mdCount = new int[mdsNum];
         for (int i = 0, j = 0, k = 0; i < dirCount * dirSize; i++) {
             mdCount[j] = mdCount[j] + 1;
@@ -51,21 +80,27 @@ public class TestFunction extends BaseMultiMdTest {
                 }
                 k = 0;
             }
-        }/*
-        double fdb = 0;
-        for (int i = 0; i < mdsNum; i++) {
-            fdb += Math.pow((mdCount[i] / (dirCount * dirSize * 1.0)) - 1, 2);
-//            logger.info(mdCount[i]+"");
         }
-        fdb *= 1.0 / (mdsNum - 1);
-        fdb = Math.sqrt(fdb);
-        logger.info(bucketSize + "\t\t" + fdb);
-        */
         double dx = 0;
         double mean = dirCount * dirSize / (mdsNum * 1.0);
         for (int i = 0; i < mdsNum; i++) {
             dx += Math.pow(1.0 * (mdCount[i] - mean), 2);
-//            logger.info(mdCount[i]+" " + dx);
+        }
+        dx = dx / mdsNum * 1.0;
+        dx = Math.sqrt(dx);
+        logger.info(bucketSize + "\t\t" + dx + " " + mean);
+
+        dx = 0;
+        int[] mdCount_hash = new int[mdsNum];
+        for (int i = 0, j = 0; i < dirCount; i++) {
+            mdCount_hash[j] = mdCount_hash[j] + 1;
+            if (++j > mdsNum - 1) {
+                j = 0;
+            }
+        }
+
+        for (int i = 0; i < mdsNum; i++) {
+            dx += Math.pow(1.0 * (mdCount_hash[i]*dirSize - mean), 2);
         }
         dx = dx / mdsNum * 1.0;
         dx = Math.sqrt(dx);
